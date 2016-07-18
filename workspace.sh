@@ -92,7 +92,7 @@ init() {
 }
 
 is_workspace() {
-	test -e $TT_HOME/workspaces/$1
+	test $# -eq 1 -a -e "$TT_HOME/workspaces/$1/"
 }
 
 is_workspace_dir() {
