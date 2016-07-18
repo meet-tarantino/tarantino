@@ -381,7 +381,9 @@ tt_install() {
 	fi
 
 	# set up service cache
-	dc config --services > "$ALL_SERVICES_FILE"
+	# REMOVE CACHING until we figure this out for multiple workspaces that can change
+	# ALL_SERVICES_FILE="$TT_WORKSPACE_DIR/all_services.txt"
+	#dc config --services > "$ALL_SERVICES_FILE"
 
 	if ! hash jq; then
 		echo 'Warning: you do not appear to have `jq` installed, `tt data` usage commands will not be complete'
