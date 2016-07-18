@@ -33,13 +33,6 @@ dc_get_services() {
 	get_all_services | grep -Ev $NOT_SERVICES_PATTERN
 }
 
-dc_sample_data_scripts() {
-	local sample_data_dir="$PROJECTS/$SAMPLE_DATA"
-	if [ -d $sample_data_dir ]; then
-		cat "$sample_data_dir"/package.json | jq -r '.scripts | keys[]' | grep -vx test
-	fi
-}
-
 dc_get_repos() {
 	if [[ $# -gt 0 ]]; then
 		services=
@@ -52,7 +45,7 @@ dc_get_repos() {
 				if [ ! -z "$self" ]; then
 					repos="$repos $self"
 				fi
-				links=$(get_links $service | grep -Ev $NOT_SERVICES_PATTERN)
+				links=$(dc_get_links $service | grep -Ev $NOT_SERVICES_PATTERN)
 				if [ ! -z "$links" ]; then
 					repos="$repos $links"
 				fi

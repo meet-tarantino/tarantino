@@ -4,6 +4,21 @@ source ./variables.sh
 source ./parse-util.sh
 source ./compose-util.sh
 
+tt_get_all_services() {
+	dc_get_all_services
+}
+
+tt_get_services() {
+	dc_get_services
+}
+
+tt_sample_data_scripts() {
+	local sample_data_dir="$PROJECTS/$SAMPLE_DATA"
+	if [ -d $sample_data_dir ]; then
+		cat "$sample_data_dir"/package.json | jq -r '.scripts | keys[]' | grep -vx test
+	fi
+}
+
 info() {
 	echo INFO: $*
 }
@@ -52,15 +67,11 @@ tt_usage() {
 	echo '  create [container] - create all [or named] containers'
 	echo '  data [command] - load stubbed out data'
 	echo '  destroy [container] - destroy all [or named] containers'
-	echo '  grafana - launch grafana in your browser'
-	echo '  kue - launch kue in your browser'
 	echo '  install - prepare environment for tarantino'
 	echo '  ip <container> - retrieve ip address of a specific container'
-	echo '  logs - launch real-time log monitoring in your browser'
 	echo '  manage <options> - manage the building and publishing of containers'
 	echo '  npm_reinstall - remove and reinstall all npm module dependences'
 	echo '  pull [service] - pull sources for all [or named] projects without changes'
-	echo '  rabbit - launch rabbit management console in your browser'
 	echo '  recreate [container] - recreate all [or named] containers'
 	echo '  restart - restart all containers'
 	echo '  upgrade - upgrade to latest tarantino version'
@@ -102,13 +113,6 @@ ttd_usage() {
 	echo '  ongoing - keep generating Aldo Ray data set [LEGACY]'
 }
 
-tt_api() {
-	tt_browse vega :8080
-}
-
-tt_utopia() {
-	tt_browse utopia :8080
-}
 
 tt_browse() {
 	local raw=$(echo $* | sed 's/ //g') # merge all args into 1 string
@@ -153,7 +157,7 @@ tt_logs() {
 
 tt_check() {
 	local projects=$PROJECTS
-	local repos=$(get_repos $*)
+	local repos=$(dc_get_repos $*)
 	local success=true
 
 	for repo in $repos; do
@@ -173,7 +177,7 @@ tt_check() {
 
 tt_clone() {
 	local projects=$PROJECTS
-	local repos=$(get_repos $*)
+	local repos=$(dc_get_repos $*)
 	local success=true
 
 	pushd . &> /dev/null
@@ -200,7 +204,7 @@ tt_npm_reinstall() {
 
 tt_pull() {
 	local projects=$PROJECTS
-	local repos=$(get_repos $*)
+	local repos=$(dc_get_repos $*)
 
 	local skipped=
 	local updated=
@@ -235,7 +239,7 @@ tt_pull() {
 tt_module_exec() {
 	local projects=$PROJECTS
 	local services=$(tt_get_services)
-	local operation=$*
+	local operation=$@
 	local success=true
 
 	pushd .
@@ -256,13 +260,13 @@ tt_npm() {
 }
 
 tt_create() {
-	if ! tt_check $*; then
+	if ! tt_check $@; then
 		echo "NOTE: You must clone service repositories before creating containers; otherwise, empty root-privilege directories would be created and that's poop."
 		echo 'Running "tt clone" to retrieve the missing repositories.'
-		tt_clone $*
+		tt_clone $@
 	fi
-	dc up -d $*
-	for service in $*; do
+	dc up -d $@
+	for service in $@; do
 		echo $service: $(tt_ip $service)
 	done
 }
@@ -272,17 +276,9 @@ tt_destroy() {
 		dc kill
 		dc down -v # destroys networks, etc.
 	else
-		dc kill $*
-		dc rm -fv $*
+		dc kill $@
+		dc rm -fv $@
 	fi
-}
-
-tt_grafana() {
-	tt_browse grafana :3000
-}
-
-tt_kue() {
-	tt_browse wolfe :8080
 }
 
 install_docker_compose() {
@@ -401,14 +397,14 @@ tt_rabbit() {
 
 
 tt_recreate() {
-	tt_destroy $*
+	tt_destroy $@
 	info creating containers
-	tt_create $*
+	tt_create $@
 }
 
 tt_restart() {
-	dc kill $*
-	dc start $*
+	dc kill $@
+	dc start $@
 }
 
 tt_upgrade() {
@@ -441,11 +437,11 @@ tt_data() {
 	#legacy aray
 	case "$script" in
 		aray)
-			ttd_aray $* ;;
+			ttd_aray $@ ;;
 		ongoing)
-			ttd_ongoing $* ;;
+			ttd_ongoing $@ ;;
 		*)
-			run_sample_data $script $* ;;
+			run_sample_data $script $@ ;;
 	esac
 }
 
@@ -463,7 +459,7 @@ run_sample_data() {
 	echo "running sample data script: $script"
 
 	if [ $# -gt 0 ]; then
-		script="$script -- $*" # add any extra args
+		script="$script -- $@" # add any extra args
 	fi
 
 	pushd $sample_data_project;
@@ -507,4 +503,4 @@ ttd_ongoing() {
 	done
 }
 
-main tt $*
+main tt $@
