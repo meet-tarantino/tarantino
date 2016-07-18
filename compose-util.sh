@@ -1,11 +1,7 @@
 #!/usr/bin/env bash
 
 dc_file() {
-	if [ $IS_GLOBAL = true ]; then
-		echo /usr/local/share/tarantino/docker-compose.yml
-	else
-		echo $(dirname $0)/docker-compose.yml
-	fi
+	echo $TT_WORLD/docker-compose.yml
 }
 
 dc() {
