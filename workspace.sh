@@ -19,8 +19,8 @@ ws_usage() {
 }
 
 ws_init() {
-	if [ -f docker-compose.yml ]; then
-		local warning='Directory already has files, are you sure (y/N)? '
+	if is_workspace $(pwd); then
+		local warning='Directory is already a workspace, are you sure you wish to reinitialize? (y/N)? '
 		read -n 1 -p "$warning" CONFIRM
 		if [ "$CONFIRM" = 'y' ]; then
 			echo
@@ -38,4 +38,10 @@ init() {
 	echo sample docker-compose.yml file created
 
 	cp -R $TT_SHARE/templates/grafana .
+}
+
+is_workspace() {
+	if [ ! -f $1/docker-compose.yml ]; then
+		return 1
+	fi
 }
