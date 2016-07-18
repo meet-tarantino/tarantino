@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 dc_file() {
-	echo $TT_WORLD/docker-compose.yml
+	echo $TT_WORKSPACE_DIR/docker-compose.yml
 }
 
 dc() {

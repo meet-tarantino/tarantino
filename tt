@@ -7,10 +7,10 @@ PUBLISH_PORTS=${PUBLISH_PORTS:-true}
 
 IS_GLOBAL=$([ "$0" = "/usr/local/bin/tt" ] && echo true || echo false)
 TT_SHARE=$([ $IS_GLOBAL = true ] && echo /usr/local/share || dirname $0)
-TT_WORLD=${TT_WORLD:-$TT_SHARE/tarantino}
-TT_WORKSPACE=${TT_WORKSPACE:-$(basename $TT_WORLD)_}
+TT_WORKSPACE_DIR=${TT_WORKSPACE_DIR:-$TT_SHARE/tarantino}
+TT_WORKSPACE=${TT_WORKSPACE:-$(basename $TT_WORKSPACE_DIR)_}
 
-ALL_SERVICES_FILE="$TT_WORLD/all_services.txt"
+ALL_SERVICES_FILE="$TT_WORKSPACE_DIR/all_services.txt"
 NOT_SERVICES_PATTERN='mongo|redis|rabbit|graphite|elasticsearch|kibana|grafana|dynamo'
 SAMPLE_DATA='sample-data'
 
@@ -401,7 +401,7 @@ tt_install() {
 }
 
 tt_ip() {
-	docker inspect --format '{{ .NetworkSettings.Networks.'$TT_WORKSPACE'default.IPAddress }}' ${TT_WORKSPACE}$1\_1
+	docker inspect --format '{{ .NetworkSettings.Networks.'${TT_WORKSPACE}'_default.IPAddress }}' ${TT_WORKSPACE}_$1\_1
 }
 
 tt_rabbit() {
