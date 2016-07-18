@@ -15,6 +15,7 @@ ws_usage() {
 	echo '  rm <workspace> - unregister a workspace from your user account'
 	echo '  ls - list registered workspaces '
 	echo '  use <workspace> - switch to a different workspace'
+	echo '  current - display the current workspace and directory'
 	echo '  upgrade [workspace] - fetch latest workspace definition, update docker images'
 }
 
@@ -62,6 +63,10 @@ ws_use() {
 		return 1
 	fi
 	ln -snf $TT_HOME/workspaces/$alias $TT_HOME/current
+}
+
+ws_current() {
+	echo $(get_workspace) '->' $(readlink -f $(get_workspace_dir))
 }
 
 ws_init() {
