@@ -19,6 +19,11 @@ ws_usage() {
 }
 
 ws_add() {
+	if [ $# -ne 2 ]; then
+		echo 'USAGE: tt workspace add <alias> <workspace_dir>'
+		return 1
+	fi
+
 	local alias=$1
 	local workspace_dir=$2
 	if ! is_workspace $workspace_dir; then
@@ -43,6 +48,12 @@ ws_rm() {
 		return 1
 	fi
 	rm $symlink
+}
+
+ws_ls() {
+	if [ -d $TT_HOME/workspaces ]; then
+		ls $TT_HOME/workspaces
+	fi
 }
 
 ws_init() {
