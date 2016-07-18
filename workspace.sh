@@ -26,7 +26,7 @@ ws_add() {
 
 	local alias=$1
 	local workspace_dir=$2
-	if ! is_workspace $workspace_dir; then
+	if ! is_workspace_dir $workspace_dir; then
 		echo "$workspace_dir is not a valid workspace directory, please run 'tt workspace init' within the folder"
 		return 1
 	fi
@@ -57,11 +57,16 @@ ws_ls() {
 }
 
 ws_use() {
+	local workspace=$TT_HOME/workspaces/$1
+
+	if [ ! -e $TT_HOME/workspaces/$1 ]; then
+
+	fi
 	ln -snf $TT_HOME/workspaces/$1 $TT_HOME/current
 }
 
 ws_init() {
-	if is_workspace $(pwd); then
+	if is_workspace_dir $(pwd); then
 		local warning='Directory is already a workspace, are you sure you wish to reinitialize? (y/N)? '
 		read -n 1 -p "$warning" CONFIRM
 		if [ "$CONFIRM" = 'y' ]; then
@@ -82,7 +87,7 @@ init() {
 	cp -R $TT_SHARE/templates/grafana .
 }
 
-is_workspace() {
+is_workspace_dir() {
 	if [ ! -f $1/docker-compose.yml ]; then
 		return 1
 	fi
