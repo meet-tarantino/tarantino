@@ -11,11 +11,28 @@ ws_usage() {
 	echo commands:
 	echo
 	echo '  init - initialize a new workspace in the current directory'
-	echo '  add <workspace_dir> - register an existing workspace with your user account'
+	echo '  add <alias> <workspace_dir> - register an existing workspace with your user account'
 	echo '  rm <workspace> - unregister a workspace from your user account'
 	echo '  ls - list registered workspaces '
 	echo '  use <workspace> - switch to a different workspace'
 	echo '  upgrade [workspace] - fetch latest workspace definition, update docker images'
+}
+
+ws_add() {
+	local alias=$1
+	local workspace_dir=$2
+	if ! is_workspace $workspace_dir; then
+		echo "$workspace_dir is not a valid workspace directory, please run 'tt workspace init' within the folder"
+		return 1
+	fi
+	local workspace_root=$TT_HOME/workspaces
+	local symlink=$workspace_root/$alias
+	if  [ -e $symlink ]; then
+		echo "$alias is already registered as a workspace, please run 'tt workspace rm $alias' to remove it first"
+		return 1
+	fi
+	mkdir -p $workspace_root
+	ln -sr $workspace_dir $symlink
 }
 
 ws_init() {
