@@ -387,7 +387,7 @@ tt_install() {
 }
 
 tt_ip() {
-	docker inspect --format '{{ .NetworkSettings.Networks.tarantino_default.IPAddress }}' ${NAMESPACE}$1\_1
+	docker inspect --format '{{ .NetworkSettings.Networks.'$NAMESPACE'default.IPAddress }}' ${NAMESPACE}$1\_1
 }
 
 tt_rabbit() {
