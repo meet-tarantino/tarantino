@@ -90,6 +90,7 @@ tt_usage() {
 	echo '  restart - restart all containers'
 	echo '  upgrade - upgrade to latest tarantino version'
 	echo '  usage - usage and command overview'
+	echo '  workspace [command] - create, remove and switch workspaces'
 }
 
 ttm_usage() {
