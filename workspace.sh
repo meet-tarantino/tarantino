@@ -35,6 +35,16 @@ ws_add() {
 	ln -sr $workspace_dir $symlink
 }
 
+ws_rm() {
+	local alias=$1
+	local symlink=$TT_HOME/workspaces/$alias
+	if [ ! -e $symlink ]; then
+		echo "$alias is not a registered workspace"
+		return 1
+	fi
+	rm $symlink
+}
+
 ws_init() {
 	if is_workspace $(pwd); then
 		local warning='Directory is already a workspace, are you sure you wish to reinitialize? (y/N)? '
