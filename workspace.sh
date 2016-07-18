@@ -42,12 +42,11 @@ ws_add() {
 
 ws_rm() {
 	local alias=$1
-	local symlink=$TT_HOME/workspaces/$alias
-	if [ ! -e $symlink ]; then
+	if ! is_workspace $alias; then
 		echo "$alias is not a registered workspace"
 		return 1
 	fi
-	rm $symlink
+	rm $TT_HOME/workspaces/$alias
 }
 
 ws_ls() {
@@ -57,12 +56,12 @@ ws_ls() {
 }
 
 ws_use() {
-	local workspace=$TT_HOME/workspaces/$1
-
-	if [ ! -e $TT_HOME/workspaces/$1 ]; then
-
+	local alias=$1
+	if ! is_workspace $alias; then
+		echo "$alias is not a registered workspace"
+		return 1
 	fi
-	ln -snf $TT_HOME/workspaces/$1 $TT_HOME/current
+	ln -snf $TT_HOME/workspaces/$alias $TT_HOME/current
 }
 
 ws_init() {
@@ -85,6 +84,10 @@ init() {
 	echo sample docker-compose.yml file created
 
 	cp -R $TT_SHARE/templates/grafana .
+}
+
+is_workspace() {
+	test -e $TT_HOME/workspaces/$1
 }
 
 is_workspace_dir() {
