@@ -30,7 +30,7 @@ dc_get_all_services() {
 }
 
 dc_get_services() {
-	get_all_services | grep -Ev $NOT_SERVICES_PATTERN
+	dc_get_all_services | grep -Ev $NOT_SERVICES_PATTERN
 }
 
 dc_get_repos() {
