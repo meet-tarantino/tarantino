@@ -16,6 +16,7 @@ SAMPLE_DATA='sample-data'
 
 source $TT_SHARE/parse-util.sh
 source $TT_SHARE/compose-util.sh
+source $TT_SHARE/init.sh
 
 tt_get_all_services() {
 	dc_get_all_services
