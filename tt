@@ -7,10 +7,8 @@ PUBLISH_PORTS=${PUBLISH_PORTS:-true}
 
 IS_GLOBAL=$([ "$0" = "/usr/local/bin/tt" ] && echo true || echo false)
 TT_SHARE=$([ $IS_GLOBAL = true ] && echo /usr/local/share || dirname $0)
-TT_WORKSPACE_DIR=${TT_WORKSPACE_DIR:-$TT_SHARE/tarantino}
-TT_WORKSPACE=${TT_WORKSPACE:-$(basename $TT_WORKSPACE_DIR)_}
+TT_HOME=${TT_HOME:-~/.tt}
 
-ALL_SERVICES_FILE="$TT_WORKSPACE_DIR/all_services.txt"
 NOT_SERVICES_PATTERN='mongo|redis|rabbit|graphite|elasticsearch|kibana|grafana|dynamo'
 SAMPLE_DATA='sample-data'
 
@@ -404,7 +402,7 @@ tt_install() {
 }
 
 tt_ip() {
-	docker inspect --format '{{ .NetworkSettings.Networks.'${TT_WORKSPACE}'_default.IPAddress }}' ${TT_WORKSPACE}_$1\_1
+	docker inspect --format '{{ .NetworkSettings.Networks.'$(get_workspace)'_default.IPAddress }}' $(get_workspace)_$1\_1
 }
 
 tt_rabbit() {
@@ -426,8 +424,7 @@ tt_restart() {
 
 tt_upgrade() {
 	local tmpdir=$(mktemp -d)
-	git clone git@github.com:360incentives/tarantino.git $tmpdir || return 1
-	sudo echo About to launch installation. Please wait for confirmation that install is complete.
+	git clone git@github.com:360incentives/tarantino.git $tmpdir || return 1 sudo echo About to launch installation. Please wait for confirmation that install is complete.
 	sudo bash -c "cd $tmpdir; sleep 1s; make install" &
 }
 
@@ -518,6 +515,14 @@ ttd_ongoing() {
 		ttd_aray > /dev/null
 		[ $? -eq 0 ] || break
 	done
+}
+
+get_workspace_dir() {
+	readlink "$TT_HOME/current"
+}
+
+get_workspace() {
+	basename "$(get_workspace_dir)"
 }
 
 main tt $@
