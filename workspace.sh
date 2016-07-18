@@ -56,6 +56,10 @@ ws_ls() {
 	fi
 }
 
+ws_use() {
+	ln -snf $TT_HOME/workspaces/$1 $TT_HOME/current
+}
+
 ws_init() {
 	if is_workspace $(pwd); then
 		local warning='Directory is already a workspace, are you sure you wish to reinitialize? (y/N)? '
