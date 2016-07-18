@@ -517,12 +517,4 @@ ttd_ongoing() {
 	done
 }
 
-get_workspace_dir() {
-	readlink "$TT_HOME/current"
-}
-
-get_workspace() {
-	basename "$(get_workspace_dir)"
-}
-
 main tt $@

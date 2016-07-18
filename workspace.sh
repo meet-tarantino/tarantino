@@ -95,3 +95,11 @@ is_workspace_dir() {
 		return 1
 	fi
 }
+
+get_workspace_dir() {
+	readlink "$TT_HOME/current"
+}
+
+get_workspace() {
+	basename "$(get_workspace_dir)"
+}
