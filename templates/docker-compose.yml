@@ -59,3 +59,17 @@ services:
     volumes:
       - ${PROJECTS}/jackie:/app:ro
     working_dir: /app
+
+  jules:
+    image: mhart/alpine-node
+    command: node .
+    environment:
+      jules_jackie: http://jackie:8080
+      jules_stats__host: graphite
+    links:
+      - elasticsearch
+      - graphite
+      - mongo
+    volumes:
+      - ${PROJECTS}/jules:/app:ro
+    working_dir: /app
