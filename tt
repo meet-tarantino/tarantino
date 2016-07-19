@@ -89,26 +89,6 @@ tt_usage() {
 	echo '  workspace [command] - create, remove and switch workspaces'
 }
 
-ttd_usage() {
-	local sample_scripts=$(tt_sample_data_scripts)
-
-	tt_header
-	echo 'usage: tt data <command> [args]'
-	echo
-	echo commands:
-	echo
-	echo '  <command> - runs the sample-data project npm script of the same name'
-	if [ ! -z "$sample_scripts" ]; then
-		echo '    available commands:'
-		for script in $sample_scripts; do
-			echo "      $script"
-		done
-	fi
-	echo '  aray - generate Aldo Ray data set [LEGACY]'
-	echo '  ongoing - keep generating Aldo Ray data set [LEGACY]'
-}
-
-
 tt_browse() {
 	local raw=$(echo $* | sed 's/ //g') # merge all args into 1 string
 	local container=$raw
@@ -408,84 +388,6 @@ tt_upgrade() {
 	local tmpdir=$(mktemp -d)
 	git clone git@github.com:360incentives/tarantino.git $tmpdir || return 1 sudo echo About to launch installation. Please wait for confirmation that install is complete.
 	sudo bash -c "cd $tmpdir; sleep 1s; make install" &
-}
-
-tt_data() {
-	local script=$1
-	shift
-
-	if [ -z "$script" ]; then
-		ttd_usage
-		return 1;
-	fi
-
-	#legacy aray
-	case "$script" in
-		aray)
-			ttd_aray $@ ;;
-		ongoing)
-			ttd_ongoing $@ ;;
-		*)
-			run_sample_data $script $@ ;;
-	esac
-}
-
-run_sample_data() {
-	local sample_data_project="$TT_PROJECTS/$SAMPLE_DATA"
-
-	local script=$1
-	shift
-
-	if [ ! -d $sample_data_project ]; then
-		echo "requires the $SAMPLE_DATA repository, cloning..."
-		tt_clone $SAMPLE_DATA
-	fi
-
-	echo "running sample data script: $script"
-
-	if [ $# -gt 0 ]; then
-		script="$script -- $@" # add any extra args
-	fi
-
-	pushd $sample_data_project;
-
-	npm run $script
-	result=$?
-
-	popd &> /dev/null
-	return $result
-}
-
-ttd_aray() {
-	local projects=$TT_PROJECTS
-	local marsellus_ip=$(tt_ip marsellus)
-	local redis_ip=$(tt_ip redis)
-	local rabbit_ip=$(tt_ip rabbit)
-	local mongo_ip=$(tt_ip mongo)
-	local vega_ip=$(tt_ip vega)
-	local utopia_ip=$(tt_ip utopia)
-
-	if [ ! -d $projects/gimp/data ]; then
-		tt_check
-		return
-	fi
-
-	pushd $projects/gimp/data > /dev/null
-	marsellus="http://$marsellus_ip:8090" mongo="mongodb://$mongo_ip/Gimp" marsellus_redis=$redis_ip \
-		rabbithost=$rabbit_ip rabbitlogin=admin rabbitpassword=rabbit \
-		utopia_ip=$utopia_ip \
-		baseUrl="http://$vega_ip/v1" node .
-	result=$?
-	popd > /dev/null
-	return $result
-}
-
-ttd_ongoing() {
-	while true; do
-		echo -n .
-		ttd_aray > /dev/null
-		[ $? -eq 0 ] || break
-	done
 }
 
 main tt $@
