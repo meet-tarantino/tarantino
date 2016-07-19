@@ -22,7 +22,7 @@ dc_get_links() {
 }
 
 dc_get_all_services() {
-	if [ $IS_GLOBAL = true -a -f $ALL_SERVICES_FILE ]; then
+	if [ "$IS_GLOBAL" = true -a -f "$ALL_SERVICES_FILE" ]; then
 		cat "$ALL_SERVICES_FILE"
 	else
 		dc config --services

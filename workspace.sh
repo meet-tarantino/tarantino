@@ -66,7 +66,7 @@ ws_use() {
 }
 
 ws_current() {
-	echo $(get_workspace) '->' $(readlink -f $(get_workspace_dir))
+	echo $(get_workspace) '->' $(readlink -f "$(get_workspace_dir)")
 }
 
 ws_init() {
