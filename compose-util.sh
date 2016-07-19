@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+tt_dc() {
+	dc $@
+}
+
 dc_file() {
 	echo $(get_workspace_dir)/docker-compose.yml
 }
