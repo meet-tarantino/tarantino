@@ -10,7 +10,6 @@ install: uninstall
 		cp -f tt_completion /usr/local/share/tarantino && \
 		cp -f tt_completion_hook.bash /etc/bash_completion.d/ && \
 		./tt install && \
-		./tt dc pull && \
 		echo Installation complete. && \
 		echo Press enter to continue.
 
