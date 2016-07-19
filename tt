@@ -39,7 +39,7 @@ main() {
 		>&2 echo
 	fi
 
-	if [[ ! -z "$1" && "$1" != "workspace" && -z "$(get_workspace_dir)" ]]; then
+	if [[ -z "$(get_workspace_dir)" && ! -z "$1" && "$1" != "workspace" && "$1" != "install" ]]; then
 		>&2 echo "ERROR: You don't have an active workspace. Run 'tt workspace use <workspace>' to select one."
 		>&2 echo
 		>&2 echo Available workspaces:
