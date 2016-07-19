@@ -39,6 +39,16 @@ main() {
 		>&2 echo
 	fi
 
+	if [[ ! -z "$1" && "$1" != "workspace" && -z "$(get_workspace_dir)" ]]; then
+		>&2 echo "ERROR: You don't have an active workspace. Run 'tt workspace use <workspace>' to select one."
+		>&2 echo
+		>&2 echo Available workspaces:
+		for dep in $(ws_ls); do
+			>&2 echo "  $dep"
+		done
+		return 1
+	fi
+
 	run_sub_command tt $@
 }
 
