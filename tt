@@ -118,10 +118,6 @@ tt_browse() {
 	x-www-browser $url &> /dev/null &
 }
 
-tt_logs() {
-	tt_browse kibana :80
-}
-
 tt_check() {
 	local projects=$TT_PROJECTS
 	local repos=$(dc_get_repos $*)
