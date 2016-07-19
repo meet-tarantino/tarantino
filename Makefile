@@ -3,10 +3,6 @@ all:
 install: uninstall
 	cp tt /usr/local/bin/ && \
 		mkdir -p /usr/local/share/tarantino && \
-		cp -f docker-compose.yml /usr/local/share/tarantino/docker-compose.yml && \
-		cp -r grafana /usr/local/share/tarantino && \
-		cp -r kibana /usr/local/share/tarantino && \
-		cp -r dynamo /usr/local/share/tarantino && \
 		cp -f tt_completion /usr/local/share/tarantino && \
 		cp -f tt_completion_hook.bash /etc/bash_completion.d/ && \
 		./tt install && \
