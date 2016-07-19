@@ -21,7 +21,7 @@ Install Tarantino by cloning this repository and running `sudo make install`. Up
 ```
 cd $(mktemp -d)
 git clone git@github.com:meet-tarantino/tarantino.git .
-sudo make install && tt clone
+sudo make install
 ```
 
 _NOTE:_ You don't have to clone everything if you don't want to.
