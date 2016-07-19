@@ -9,7 +9,7 @@ dc_file() {
 }
 
 dc() {
-	TT_PROJECTS=$TT_PROJECTS docker-compose -f $(dc_file) $*
+	PROJECTS=$TT_PROJECTS TT_PROJECTS=$TT_PROJECTS docker-compose -f $(dc_file) $*
 }
 
 dc_get_links() {
