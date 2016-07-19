@@ -78,7 +78,6 @@ tt_usage() {
 	echo
 	echo commands:
 	echo
-	echo '  api - launch the api homepage in your browser'
 	echo '  browse <container[:port][path]> - launch a page of a named container in your browser'
 	echo '  check [service] - check all [or named] source directories'
 	echo '  clone [service] - clone all [or named] source directories'
@@ -92,7 +91,6 @@ tt_usage() {
 	echo '  recreate [container] - recreate all [or named] containers'
 	echo '  restart - restart all containers'
 	echo '  upgrade - upgrade to latest tarantino version'
-	echo '  usage - usage and command overview'
 	echo '  workspace [command] - create, remove and switch workspaces'
 }
 
