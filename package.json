@@ -11,16 +11,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/360incentives/tarantino"
+    "url": "https://github.com/meet-tarantino/tarantino"
   },
   "keywords": [
     "tarantino",
     "docker"
   ],
   "author": "",
-  "license": "360 Incentives, Inc.",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/360incentives/tarantino/issues"
+    "url": "https://github.com/meet-tarantino/tarantino/issues"
   },
-  "homepage": "https://github.com/360incentives/tarantino"
+  "homepage": "https://github.com/meet-tarantino/tarantino"
 }
