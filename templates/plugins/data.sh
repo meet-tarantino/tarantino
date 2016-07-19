@@ -15,6 +15,16 @@ tt_data() {
 ttd_usage() {
 	local sample_scripts=$(tt_sample_data_scripts)
 
+	if ! hash jq; then
+		echo 'Warning: you do not appear to have `jq` installed, `tt data` usage commands will not be complete'
+		echo 'run `sudo apt-get install -y jq` to resolve this'
+	fi
+
+	if [ ! -d "$TT_PROJECTS/$SAMPLE_DATA" ]; then
+		echo 'Warning: you do not have the sample-data repository, `tt data` usage will not list sample scripts'
+		echo 'run `tt clone sample-data` to resolve this'
+	fi
+
 	tt_header
 	echo 'usage: tt data <command> [args]'
 	echo
