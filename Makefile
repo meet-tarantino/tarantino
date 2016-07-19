@@ -15,7 +15,5 @@ uninstall:
 		tt destroy; \
 		rm -f /usr/local/bin/tt && \
 		rm -rf /usr/local/share/tarantino && \
-		rm -f /usr/bin/tt && \
-		rm -rf /usr/share/tarantino && \
 		rm -f /etc/bash_completion.d/tt_completion_hook.bash
 
