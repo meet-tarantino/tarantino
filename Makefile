@@ -13,8 +13,6 @@ install: uninstall
 		echo Press enter to continue.
 
 uninstall:
-	echo NOTE: about to use global Tarantino to destroy existing containers, ignore the one warning below.; \
-		tt destroy; \
 		rm -f /usr/local/bin/tt && \
 		rm -rf /usr/local/share/tarantino && \
 		rm -f /etc/bash_completion.d/tt_completion_hook.bash
