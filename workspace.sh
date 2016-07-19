@@ -47,7 +47,21 @@ ws_rm() {
 		echo "$alias is not a registered workspace"
 		return 1
 	fi
+
+	# destroy containers in the workspace to be removed and remove workspace
+	local previous=$(get_workspace)
+	ws_use $alias
+	tt_destroy
 	rm $TT_HOME/workspaces/$alias
+
+	# if the workspace was previously in context
+	if [ "$previous" == "$alias" ]; then
+		# clear current
+		rm $TT_HOME/current
+	else
+		# otherwise, revert to whatever our previous workspace was
+		ws_use "$previous"
+	fi
 }
 
 ws_ls() {
