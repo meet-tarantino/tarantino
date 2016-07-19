@@ -68,7 +68,6 @@ tt_usage() {
 	echo '  check [service] - check all [or named] source directories'
 	echo '  clone [service] - clone all [or named] source directories'
 	echo '  create [container] - create all [or named] containers'
-	echo '  data [command] - load stubbed out data'
 	echo '  dc - run docker-compose commands in the context of your workspace'
 	echo '  destroy [container] - destroy all [or named] containers'
 	echo '  install - prepare environment for tarantino'
