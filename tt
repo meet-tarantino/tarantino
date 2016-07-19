@@ -10,8 +10,9 @@ TT_HOME=${TT_HOME:-~/.tt}
 NOT_SERVICES_PATTERN='mongo|redis|rabbit|graphite|elasticsearch|kibana|grafana|dynamo'
 SAMPLE_DATA='sample-data'
 
-source $TT_SHARE/parse-util.sh
 source $TT_SHARE/dc.sh
+source $TT_SHARE/install.sh
+source $TT_SHARE/parse-util.sh
 source $TT_SHARE/workspace.sh
 
 tt_get_all_services() {
@@ -242,113 +243,6 @@ tt_destroy() {
 		dc kill $@
 		dc rm -fv $@
 	fi
-}
-
-install_docker_compose() {
-	curl -L https://github.com/docker/compose/releases/download/1.6.0/docker-compose-`uname -s`-`uname -m` > /tmp/docker-compose
-	sudo mv /tmp/docker-compose /usr/local/bin/
-	sudo chmod +x /usr/local/bin/docker-compose
-}
-
-tt_is_docker_installed() {
-	if hash docker 2>/dev/null; then
-		local version=$(docker -v | sed 's/^Docker version \([^,]*\),.*/\1/')
-		local versionMax=$(printf "$version\n1.9.1" | sort -V | tail -1)
-		if [ "$versionMax" = "1.9.1" ]; then
-			info docker version 1.10+ is required but you have $version, updating docker
-			return 1
-		else
-			info docker already installed.
-			return 0
-		fi
-	else
-		info installing docker...
-		return 1
-	fi
-}
-
-tt_is_docker_compose_installed() {
-	if hash docker-compose 2>/dev/null; then
-		# this comparison should keep working for a while
-		local version=$(docker-compose -v | sed 's/^docker-compose version \([^,]*\),.*/\1/')
-		local versionMax=$(printf "$version\n1.5.2" | sort -V | tail -1)
-		if [ "$versionMax" = "1.5.2" ]; then
-			info docker-compose version 1.6+ is required but you have $version, updating docker-compose
-			return 1
-		else
-			info docker-compose already installed.
-			return 0
-		fi
-	else
-		info installing docker-compose...
-		return 1
-	fi
-}
-
-tt_install() {
-	user=${SUDO_USER:-$USER}
-
-	if [ ! -d ~/projects ]; then
-		mkdir -p ~/projects
-		chown $user:$user ~/projects
-	fi
-
-	if hash curl 2>/dev/null; then
-		info curl already installed.
-	else
-		info Installing curl...
-		sudo apt-get install -y curl
-	fi
-
-	if ! tt_is_docker_installed; then
-		info "It's coffee time 'cause this will take a while"
-		curl -sSL https://get.docker.com | sudo sh
-	fi
-
-	if ! tt_is_docker_compose_installed; then
-		install_docker_compose
-	fi
-
-	# if we know how to check for certificates ...
-	if [ -d /usr/share/ca-certificates ]; then
-		if [ "$(find /usr/share/ca-certificates -name 'Entrust*G2*')" = "" ]; then
-			info "You're certificate store is out of date, updating certificates"
-			sudo apt-get update &> /dev/null
-			sudo apt-get install -y ca-certificates
-			sudo service docker restart
-		else
-			info "Entrust G2 certificate found."
-		fi
-	fi
-
-	if groups $user | grep &>/dev/null '\bdocker\b'; then
-		info $user already has access to run docker commands.
-	else
-		info Granting $user access to run docker commands without sudo. You\'ll need to re-login to take affect.
-		sudo usermod -a -G docker $user
-	fi
-
-	# set up service cache
-	# REMOVE CACHING until we figure this out for multiple workspaces that can change
-	# ALL_SERVICES_FILE="$TT_WORKSPACE_DIR/all_services.txt"
-	#dc config --services > "$ALL_SERVICES_FILE"
-
-	if ! hash jq; then
-		echo 'Warning: you do not appear to have `jq` installed, `tt data` usage commands will not be complete'
-		echo 'run `sudo apt-get install -y jq` to resolve this'
-	fi
-
-	if [ ! -d "$TT_PROJECTS/$SAMPLE_DATA" ]; then
-		echo 'Warning: you do not have the sample-data repository, `tt data` usage will not list sample scripts'
-		echo 'run `tt clone sample-data` to resolve this'
-	fi
-
-	# Folks are already waiting during this process, so we may as well do the clone now
-	# to prevent yet another waiting period when they actually try to run "tt create".
-	# We don't want to clone the repositories as root to ensure privileges and SSH keys are correct.
-
-	## Now that we can tt create 'specific' that will only clone the required repos, this might be more than necessary
-	#sudo -u $SUDO_USER tt clone
 }
 
 tt_ip() {
