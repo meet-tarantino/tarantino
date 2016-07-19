@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 tt_workspace() {
-	main ws $*
+	run_sub_command ws $@
 }
 
 ws_usage() {

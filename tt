@@ -34,11 +34,15 @@ main() {
 		>&2 echo
 	fi
 
-	if [[ "$(pwd)" == *tarantino* && $TT_IS_GLOBAL = true && "$2" != "ip" ]]; then
+	if [[ "$(pwd)" == *tarantino* && $TT_IS_GLOBAL = true && "$1" != "ip" ]]; then
 		>&2 echo WARNING: You\'re running global tarantino while working on tarantino locally.
 		>&2 echo
 	fi
 
+	run_sub_command tt $@
+}
+
+run_sub_command() {
 	local prefix=$1
 	shift
 
@@ -266,4 +270,4 @@ tt_upgrade() {
 	sudo bash -c "cd $tmpdir; sleep 1s; make install" &
 }
 
-main tt $@
+main $@
