@@ -1,0 +1,26 @@
+{
+  "name": "tarantino",
+  "version": "1.0.0",
+  "description": "Director of our little world.",
+  "main": "tt",
+  "bin": {
+    "tt": "tt"
+  },
+  "scripts": {
+    "test": "exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/360incentives/tarantino"
+  },
+  "keywords": [
+    "tarantino",
+    "docker"
+  ],
+  "author": "",
+  "license": "360 Incentives, Inc.",
+  "bugs": {
+    "url": "https://github.com/360incentives/tarantino/issues"
+  },
+  "homepage": "https://github.com/360incentives/tarantino"
+}

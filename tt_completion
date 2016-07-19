@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+
+COMMANDS="api browse check clone create data destroy grafana kue install ip logs manage npm_reinstall pull rabbit recreate restart upgrade usage"
+DATA_COMMANDS="aray ongoing"
+MANAGE_COMMANDS="build pull push usage"
+SAMPLE_DATA=${PROJECTS:-~/projects}/sample-data
+
+tt_complete() {
+	local word=''
+	local cmd=''
+	local args=0
+	while [[ $# -gt 1 ]]; do
+		case "$1" in
+		-w|--word)
+			word=`echo $2 | tr -d "\""`
+			shift ;;
+		-c|--cmd)
+			cmd=`echo $2 | tr -d "\""`
+			shift ;;
+		-a|--args)
+			args=$2
+			shift ;;
+		esac
+		shift
+	done
+
+	if [ $args -gt 3 ]; then
+		#multi arg case
+		case "$cmd" in
+		create)
+			completion_all_services $word ;;
+		destroy|recreate)
+			completion_running_services $word ;;
+		pull|clone|check)
+			completion_services $word ;;
+		esac
+	else
+		#single arg case
+		case "$cmd" in
+		tt|"")
+			completion_base $word ;;
+		data)
+			completion_data $word ;;
+		manage)
+			completion_manage $word ;;
+		create)
+			completion_all_services $word ;;
+		destroy|recreate|ip|browse)
+			completion_running_services $word ;;
+		pull|clone|check)
+			completion_services $word ;;
+		esac
+	fi
+}
+
+completion_base() {
+	echo "$COMMANDS"
+}
+
+completion_data() {
+	echo "$DATA_COMMANDS"
+	if ! hash jq; then
+		return 0
+	fi
+	if [ ! -d "$SAMPLE_DATA" ]; then
+		return 0
+	fi
+	tt sample_data_scripts 2> /dev/null
+}
+
+completion_manage() {
+	echo "$MANAGE_COMMANDS"
+}
+
+completion_all_services() {
+	tt get_all_services 2> /dev/null
+}
+
+completion_services() {
+	tt get_services 2> /dev/null
+}
+
+completion_running_services() {
+	local running_ids=$(docker ps -q)
+	if [ ! -z "$running_ids" ]; then
+		docker inspect --format \
+			'{{index .Config.Labels "com.docker.compose.project"}} {{index .Config.Labels "com.docker.compose.service"}}' \
+			$running_ids | sed -n 's/^tarantino //p'
+	fi
+}
+
+tt_complete $@

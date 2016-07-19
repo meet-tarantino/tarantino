@@ -1,0 +1,510 @@
+#!/bin/bash
+
+source ./variables.sh
+source ./parse-util.sh
+source ./compose-util.sh
+
+info() {
+	echo INFO: $*
+}
+
+main() {
+	local user=${SUDO_USER:-$USER}
+	if ! groups $user | grep &>/dev/null '\bdocker\b'; then
+		>&2 echo WARNING: You\'re not in the \"docker\" group. You may need to log out and back in.
+		>&2 echo
+	fi
+
+	if [[ "$(pwd)" == *tarantino* && $IS_GLOBAL = true && "$2" != "ip" ]]; then
+		>&2 echo WARNING: You\'re running global tarantino while working on tarantino locally.
+		>&2 echo
+	fi
+
+	local prefix=$1
+	shift
+
+	if [ $# -eq 0 ]; then
+		$prefix\_usage
+		return 1
+	fi
+
+	local cmd=$1
+	shift
+
+	$prefix\_$cmd $*
+}
+
+tt_header() {
+	echo "tarantino - cross-service development environment"
+	echo
+}
+
+tt_usage() {
+	tt_header
+	echo "usage: tt <command> [args]"
+	echo
+	echo commands:
+	echo
+	echo '  api - launch the api homepage in your browser'
+	echo '  browse <container[:port][path]> - launch a page of a named container in your browser'
+	echo '  check [service] - check all [or named] source directories'
+	echo '  clone [service] - clone all [or named] source directories'
+	echo '  create [container] - create all [or named] containers'
+	echo '  data [command] - load stubbed out data'
+	echo '  destroy [container] - destroy all [or named] containers'
+	echo '  grafana - launch grafana in your browser'
+	echo '  kue - launch kue in your browser'
+	echo '  install - prepare environment for tarantino'
+	echo '  ip <container> - retrieve ip address of a specific container'
+	echo '  logs - launch real-time log monitoring in your browser'
+	echo '  manage <options> - manage the building and publishing of containers'
+	echo '  npm_reinstall - remove and reinstall all npm module dependences'
+	echo '  pull [service] - pull sources for all [or named] projects without changes'
+	echo '  rabbit - launch rabbit management console in your browser'
+	echo '  recreate [container] - recreate all [or named] containers'
+	echo '  restart - restart all containers'
+	echo '  upgrade - upgrade to latest tarantino version'
+	echo '  usage - usage and command overview'
+}
+
+ttm_usage() {
+	tt_header
+	echo 'usage: tt manage <command> [args]'
+	echo
+	echo commands:
+	echo
+	echo '  build - build docker image in current directory'
+	echo '  pull - pull latest docker images from registry'
+	echo '  push - push docker image in current directory to registry'
+	echo '  usage - usage and command overview'
+}
+
+tt_manage() {
+	main ttm $*
+}
+
+ttd_usage() {
+	local sample_scripts=$(tt_sample_data_scripts)
+
+	tt_header
+	echo 'usage: tt data <command> [args]'
+	echo
+	echo commands:
+	echo
+	echo '  <command> - runs the sample-data project npm script of the same name'
+	if [ ! -z "$sample_scripts" ]; then
+		echo '    available commands:'
+		for script in $sample_scripts; do
+			echo "      $script"
+		done
+	fi
+	echo '  aray - generate Aldo Ray data set [LEGACY]'
+	echo '  ongoing - keep generating Aldo Ray data set [LEGACY]'
+}
+
+tt_api() {
+	tt_browse vega :8080
+}
+
+tt_utopia() {
+	tt_browse utopia :8080
+}
+
+tt_browse() {
+	local raw=$(echo $* | sed 's/ //g') # merge all args into 1 string
+	local container=$raw
+	local path=""
+	local port=""
+
+	local parseRegex='^([^:/?#]+)(:[0-9]+)?([\/?#].*)?'
+	if [[ $raw =~ $parseRegex ]]; then
+	  container=${BASH_REMATCH[1]}
+	  port=${BASH_REMATCH[2]}
+	  path=${BASH_REMATCH[3]}
+	else
+	  tt_usage | grep -e '^[ ]*browse'
+	  return 1
+	fi
+
+	local ip=$(tt_ip $container)
+	local url=http://$ip$port$path
+
+	if [ "$ip" = "" ]; then
+		echo $container is not running, starting
+		tt_create $container
+
+		local ip=$(tt_ip $container)
+		local host=http://$ip$port
+		local url=$host$path
+
+		until curl $host &> /dev/null; do
+			sleep 0.25
+			echo waiting for $container web server to start: curl $host
+		done
+	fi
+
+	echo Opening browser to $url...
+	x-www-browser $url &> /dev/null &
+}
+
+tt_logs() {
+	tt_browse kibana :80
+}
+
+tt_check() {
+	local projects=$PROJECTS
+	local repos=$(get_repos $*)
+	local success=true
+
+	for repo in $repos; do
+		if [ ! -d "$projects/$repo" ]; then
+			echo $repo not found in projects directory $projects.
+			success=false
+		fi
+	done
+
+	if [ "$success" = "true" ]; then # return success/error code
+		echo All projects found in projects directory $projects.
+		return 0
+	else
+		return 1
+	fi
+}
+
+tt_clone() {
+	local projects=$PROJECTS
+	local repos=$(get_repos $*)
+	local success=true
+
+	pushd . &> /dev/null
+	for repo in $repos; do
+		if [ ! -d "$projects/$repo" ]; then
+			echo $repo not found in projects directory $projects, cloning it.
+			git clone git@github.com:360incentives/$repo.git $projects/$repo || return 1;
+
+			# run npm install for any npm packages (the service, or its components)
+			find "$projects/$repo" -name 'package.json' -not -path "**/bower_components/*" | xargs --no-run-if-empty dirname | grep -v 'node_modules' | while read module; do
+				cd $module
+				echo in $module directory running: npm install
+				npm install
+			done
+		fi
+	done
+	popd &> /dev/null
+}
+
+tt_npm_reinstall() {
+	tt_module_exec rm -rf node_modules
+	tt_module_exec npm install
+}
+
+tt_pull() {
+	local projects=$PROJECTS
+	local repos=$(get_repos $*)
+
+	local skipped=
+	local updated=
+
+	local current=
+
+	pushd .
+	for repo in $repos; do
+		if [ -d "$projects/$repo" ]; then
+			cd $projects/$repo
+			echo ---- $repo ----
+			if [ "$(git status --porcelain | wc -c)" = "0" ]; then
+				current=$(git rev-parse HEAD)
+				git pull --rebase --ff-only
+				if [ $? -ne 0 ]; then
+					skipped="$skipped $repo"
+				elif [ $current != "$(git rev-parse HEAD)" ]; then
+					updated="$updated $repo"
+				fi
+			else
+				echo Skipping $repo because the working directory is not clean.
+				skipped="$skipped $repo"
+			fi
+		fi
+	done
+	echo
+	echo Updated: $updated
+	echo Not Clean: $skipped
+	popd
+}
+
+tt_module_exec() {
+	local projects=$PROJECTS
+	local services=$(tt_get_services)
+	local operation=$*
+	local success=true
+
+	pushd .
+	for service in $services; do
+		if [ -d "$projects/$service" ]; then
+			find $projects/$service -name 'package.json' -not -path "**/bower_components/*" | xargs dirname | grep -v 'node_modules' | while read module; do
+				echo in $module directory running: $operation
+				cd $module
+				$operation
+			done
+		fi
+	done
+	popd
+}
+
+tt_npm() {
+	tt_module_exec npm $1
+}
+
+tt_create() {
+	if ! tt_check $*; then
+		echo "NOTE: You must clone service repositories before creating containers; otherwise, empty root-privilege directories would be created and that's poop."
+		echo 'Running "tt clone" to retrieve the missing repositories.'
+		tt_clone $*
+	fi
+	dc up -d $*
+	for service in $*; do
+		echo $service: $(tt_ip $service)
+	done
+}
+
+tt_destroy() {
+	if [[ $# -eq 0 ]]; then
+		dc kill
+		dc down -v # destroys networks, etc.
+	else
+		dc kill $*
+		dc rm -fv $*
+	fi
+}
+
+tt_grafana() {
+	tt_browse grafana :3000
+}
+
+tt_kue() {
+	tt_browse wolfe :8080
+}
+
+install_docker_compose() {
+	curl -L https://github.com/docker/compose/releases/download/1.6.0/docker-compose-`uname -s`-`uname -m` > /tmp/docker-compose
+	sudo mv /tmp/docker-compose /usr/local/bin/
+	sudo chmod +x /usr/local/bin/docker-compose
+}
+
+tt_is_docker_installed() {
+	if hash docker 2>/dev/null; then
+		local version=$(docker -v | sed 's/^Docker version \([^,]*\),.*/\1/')
+		local versionMax=$(printf "$version\n1.9.1" | sort -V | tail -1)
+		if [ "$versionMax" = "1.9.1" ]; then
+			info docker version 1.10+ is required but you have $version, updating docker
+			return 1
+		else
+			info docker already installed.
+			return 0
+		fi
+	else
+		info installing docker...
+		return 1
+	fi
+}
+
+tt_is_docker_compose_installed() {
+	if hash docker-compose 2>/dev/null; then
+		# this comparison should keep working for a while
+		local version=$(docker-compose -v | sed 's/^docker-compose version \([^,]*\),.*/\1/')
+		local versionMax=$(printf "$version\n1.5.2" | sort -V | tail -1)
+		if [ "$versionMax" = "1.5.2" ]; then
+			info docker-compose version 1.6+ is required but you have $version, updating docker-compose
+			return 1
+		else
+			info docker-compose already installed.
+			return 0
+		fi
+	else
+		info installing docker-compose...
+		return 1
+	fi
+}
+
+tt_install() {
+	user=${SUDO_USER:-$USER}
+
+	if [ ! -d ~/projects ]; then
+		mkdir -p ~/projects
+		chown $user:$user ~/projects
+	fi
+
+	if hash curl 2>/dev/null; then
+		info curl already installed.
+	else
+		info Installing curl...
+		sudo apt-get install -y curl
+	fi
+
+	if ! tt_is_docker_installed; then
+		info "It's coffee time 'cause this will take a while"
+		curl -sSL https://get.docker.com | sudo sh
+	fi
+
+	if ! tt_is_docker_compose_installed; then
+		install_docker_compose
+	fi
+
+	# if we know how to check for certificates ...
+	if [ -d /usr/share/ca-certificates ]; then
+		if [ "$(find /usr/share/ca-certificates -name 'Entrust*G2*')" = "" ]; then
+			info "You're certificate store is out of date, updating certificates"
+			sudo apt-get update &> /dev/null
+			sudo apt-get install -y ca-certificates
+			sudo service docker restart
+		else
+			info "Entrust G2 certificate found."
+		fi
+	fi
+
+	if groups $user | grep &>/dev/null '\bdocker\b'; then
+		info $user already has access to run docker commands.
+	else
+		info Granting $user access to run docker commands without sudo. You\'ll need to re-login to take affect.
+		sudo usermod -a -G docker $user
+	fi
+
+	# set up service cache
+	dc config --services > "$ALL_SERVICES_FILE"
+
+	if ! hash jq; then
+		echo 'Warning: you do not appear to have `jq` installed, `tt data` usage commands will not be complete'
+		echo 'run `sudo apt-get install -y jq` to resolve this'
+	fi
+
+	if [ ! -d "$PROJECTS/$SAMPLE_DATA" ]; then
+		echo 'Warning: you do not have the sample-data repository, `tt data` usage will not list sample scripts'
+		echo 'run `tt clone sample-data` to resolve this'
+	fi
+
+	# Folks are already waiting during this process, so we may as well do the clone now
+	# to prevent yet another waiting period when they actually try to run "tt create".
+	# We don't want to clone the repositories as root to ensure privileges and SSH keys are correct.
+
+	## Now that we can tt create 'specific' that will only clone the required repos, this might be more than necessary
+	#sudo -u $SUDO_USER tt clone
+}
+
+tt_ip() {
+	docker inspect --format '{{ .NetworkSettings.Networks.tarantino_default.IPAddress }}' ${NAMESPACE}$1\_1
+}
+
+tt_rabbit() {
+	echo Username: admin Password: rabbit
+	tt_browse rabbit :15672
+}
+
+
+tt_recreate() {
+	tt_destroy $*
+	info creating containers
+	tt_create $*
+}
+
+tt_restart() {
+	dc kill $*
+	dc start $*
+}
+
+tt_upgrade() {
+	local tmpdir=$(mktemp -d)
+	git clone git@github.com:360incentives/tarantino.git $tmpdir || return 1
+	sudo echo About to launch installation. Please wait for confirmation that install is complete.
+	sudo bash -c "cd $tmpdir; sleep 1s; make install" &
+}
+
+ttm_pull() {
+	registry=$REGISTRY
+
+	docker pull $registry/node-service-base
+	docker pull elasticsearch:1.5
+	docker pull hopsoft/graphite-statsd
+	docker pull mongo
+	docker pull tutum/rabbitmq
+	docker pull redis
+}
+
+tt_data() {
+	local script=$1
+	shift
+
+	if [ -z "$script" ]; then
+		ttd_usage
+		return 1;
+	fi
+
+	#legacy aray
+	case "$script" in
+		aray)
+			ttd_aray $* ;;
+		ongoing)
+			ttd_ongoing $* ;;
+		*)
+			run_sample_data $script $* ;;
+	esac
+}
+
+run_sample_data() {
+	local sample_data_project="$PROJECTS/$SAMPLE_DATA"
+
+	local script=$1
+	shift
+
+	if [ ! -d $sample_data_project ]; then
+		echo "requires the $SAMPLE_DATA repository, cloning..."
+		tt_clone $SAMPLE_DATA
+	fi
+
+	echo "running sample data script: $script"
+
+	if [ $# -gt 0 ]; then
+		script="$script -- $*" # add any extra args
+	fi
+
+	pushd $sample_data_project;
+
+	npm run $script
+	result=$?
+
+	popd &> /dev/null
+	return $result
+}
+
+ttd_aray() {
+	local projects=$PROJECTS
+	local marsellus_ip=$(tt_ip marsellus)
+	local redis_ip=$(tt_ip redis)
+	local rabbit_ip=$(tt_ip rabbit)
+	local mongo_ip=$(tt_ip mongo)
+	local vega_ip=$(tt_ip vega)
+	local utopia_ip=$(tt_ip utopia)
+
+	if [ ! -d $projects/gimp/data ]; then
+		tt_check
+		return
+	fi
+
+	pushd $projects/gimp/data > /dev/null
+	marsellus="http://$marsellus_ip:8090" mongo="mongodb://$mongo_ip/Gimp" marsellus_redis=$redis_ip \
+		rabbithost=$rabbit_ip rabbitlogin=admin rabbitpassword=rabbit \
+		utopia_ip=$utopia_ip \
+		baseUrl="http://$vega_ip/v1" node .
+	result=$?
+	popd > /dev/null
+	return $result
+}
+
+ttd_ongoing() {
+	while true; do
+		echo -n .
+		ttd_aray > /dev/null
+		[ $? -eq 0 ] || break
+	done
+}
+
+main tt $*
