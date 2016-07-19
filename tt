@@ -82,7 +82,6 @@ tt_usage() {
 	echo '  destroy [container] - destroy all [or named] containers'
 	echo '  install - prepare environment for tarantino'
 	echo '  ip <container> - retrieve ip address of a specific container'
-	echo '  manage <options> - manage the building and publishing of containers'
 	echo '  npm_reinstall - remove and reinstall all npm module dependences'
 	echo '  pull [service] - pull sources for all [or named] projects without changes'
 	echo '  recreate [container] - recreate all [or named] containers'
@@ -90,22 +89,6 @@ tt_usage() {
 	echo '  upgrade - upgrade to latest tarantino version'
 	echo '  usage - usage and command overview'
 	echo '  workspace [command] - create, remove and switch workspaces'
-}
-
-ttm_usage() {
-	tt_header
-	echo 'usage: tt manage <command> [args]'
-	echo
-	echo commands:
-	echo
-	echo '  build - build docker image in current directory'
-	echo '  pull - pull latest docker images from registry'
-	echo '  push - push docker image in current directory to registry'
-	echo '  usage - usage and command overview'
-}
-
-tt_manage() {
-	main ttm $*
 }
 
 ttd_usage() {
@@ -427,17 +410,6 @@ tt_upgrade() {
 	local tmpdir=$(mktemp -d)
 	git clone git@github.com:360incentives/tarantino.git $tmpdir || return 1 sudo echo About to launch installation. Please wait for confirmation that install is complete.
 	sudo bash -c "cd $tmpdir; sleep 1s; make install" &
-}
-
-ttm_pull() {
-	registry=$REGISTRY
-
-	docker pull $registry/node-service-base
-	docker pull elasticsearch:1.5
-	docker pull hopsoft/graphite-statsd
-	docker pull mongo
-	docker pull tutum/rabbitmq
-	docker pull redis
 }
 
 tt_data() {
