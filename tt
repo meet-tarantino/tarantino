@@ -367,12 +367,6 @@ tt_ip() {
 	docker inspect --format '{{ .NetworkSettings.Networks.'$(get_workspace)'_default.IPAddress }}' $(get_workspace)_$1\_1
 }
 
-tt_rabbit() {
-	echo Username: admin Password: rabbit
-	tt_browse rabbit :15672
-}
-
-
 tt_recreate() {
 	tt_destroy $@
 	info creating containers
