@@ -3,8 +3,8 @@
 # variables
 TT_PROJECTS=${TT_PROJECTS:-~/projects}
 
-IS_GLOBAL=$([ "$0" = "/usr/local/bin/tt" ] && echo true || echo false)
-TT_SHARE=$([ $IS_GLOBAL = true ] && echo /usr/local/share || dirname $0)
+TT_IS_GLOBAL=$([ "$0" = "/usr/local/bin/tt" ] && echo true || echo false)
+TT_SHARE=$([ $TT_IS_GLOBAL = true ] && echo /usr/local/share || dirname $0)
 TT_HOME=${TT_HOME:-~/.tt}
 
 NOT_SERVICES_PATTERN='mongo|redis|rabbit|graphite|elasticsearch|kibana|grafana|dynamo'
@@ -33,7 +33,7 @@ main() {
 		>&2 echo
 	fi
 
-	if [[ "$(pwd)" == *tarantino* && $IS_GLOBAL = true && "$2" != "ip" ]]; then
+	if [[ "$(pwd)" == *tarantino* && $TT_IS_GLOBAL = true && "$2" != "ip" ]]; then
 		>&2 echo WARNING: You\'re running global tarantino while working on tarantino locally.
 		>&2 echo
 	fi
