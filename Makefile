@@ -2,6 +2,7 @@ all:
 
 install: uninstall
 	cp tt /usr/local/bin/ && \
+		cp *.sh /usr/local/share/tarantino && \
 		mkdir -p /usr/local/share/tarantino && \
 		cp -f tt_completion /usr/local/share/tarantino && \
 		cp -f tt_completion_hook.bash /etc/bash_completion.d/ && \
