@@ -262,7 +262,7 @@ tt_restart() {
 
 tt_upgrade() {
 	local tmpdir=$(mktemp -d)
-	git clone git@github.com:360incentives/tarantino.git $tmpdir || return 1 sudo echo About to launch installation. Please wait for confirmation that install is complete.
+	git clone git@github.com:meet-tarantino/tarantino.git $tmpdir || return 1 sudo echo About to launch installation. Please wait for confirmation that install is complete.
 	sudo bash -c "cd $tmpdir; sleep 1s; make install" &
 }
 
