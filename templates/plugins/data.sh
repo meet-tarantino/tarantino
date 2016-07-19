@@ -29,6 +29,13 @@ ttd_usage() {
 	fi
 }
 
+tt_sample_data_scripts() {
+	local sample_data_dir="$TT_PROJECTS/$SAMPLE_DATA"
+	if [ -d "$sample_data_dir" ]; then
+		cat "$sample_data_dir"/package.json | jq -r '.scripts | keys[]' | grep -vx test
+	fi
+}
+
 run_sample_data() {
 	local sample_data_project="$TT_PROJECTS/$SAMPLE_DATA"
 

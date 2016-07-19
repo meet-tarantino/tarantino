@@ -22,13 +22,6 @@ tt_get_services() {
 	dc_get_services
 }
 
-tt_sample_data_scripts() {
-	local sample_data_dir="$TT_PROJECTS/$SAMPLE_DATA"
-	if [ -d "$sample_data_dir" ]; then
-		cat "$sample_data_dir"/package.json | jq -r '.scripts | keys[]' | grep -vx test
-	fi
-}
-
 info() {
 	echo INFO: $*
 }
