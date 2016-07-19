@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # variables
-PROJECTS=${PROJECTS:-~/projects}
+TT_PROJECTS=${TT_PROJECTS:-~/projects}
 REGISTRY=${REGISTRY:-docker-registry.test.360incentives.io}
 PUBLISH_PORTS=${PUBLISH_PORTS:-true}
 
@@ -25,7 +25,7 @@ tt_get_services() {
 }
 
 tt_sample_data_scripts() {
-	local sample_data_dir="$PROJECTS/$SAMPLE_DATA"
+	local sample_data_dir="$TT_PROJECTS/$SAMPLE_DATA"
 	if [ -d $sample_data_dir ]; then
 		cat "$sample_data_dir"/package.json | jq -r '.scripts | keys[]' | grep -vx test
 	fi
@@ -169,7 +169,7 @@ tt_logs() {
 }
 
 tt_check() {
-	local projects=$PROJECTS
+	local projects=$TT_PROJECTS
 	local repos=$(dc_get_repos $*)
 	local success=true
 
@@ -189,7 +189,7 @@ tt_check() {
 }
 
 tt_clone() {
-	local projects=$PROJECTS
+	local projects=$TT_PROJECTS
 	local repos=$(dc_get_repos $*)
 	local success=true
 
@@ -216,7 +216,7 @@ tt_npm_reinstall() {
 }
 
 tt_pull() {
-	local projects=$PROJECTS
+	local projects=$TT_PROJECTS
 	local repos=$(dc_get_repos $*)
 
 	local skipped=
@@ -250,7 +250,7 @@ tt_pull() {
 }
 
 tt_module_exec() {
-	local projects=$PROJECTS
+	local projects=$TT_PROJECTS
 	local services=$(tt_get_services)
 	local operation=$@
 	local success=true
@@ -388,7 +388,7 @@ tt_install() {
 		echo 'run `sudo apt-get install -y jq` to resolve this'
 	fi
 
-	if [ ! -d "$PROJECTS/$SAMPLE_DATA" ]; then
+	if [ ! -d "$TT_PROJECTS/$SAMPLE_DATA" ]; then
 		echo 'Warning: you do not have the sample-data repository, `tt data` usage will not list sample scripts'
 		echo 'run `tt clone sample-data` to resolve this'
 	fi
@@ -460,7 +460,7 @@ tt_data() {
 }
 
 run_sample_data() {
-	local sample_data_project="$PROJECTS/$SAMPLE_DATA"
+	local sample_data_project="$TT_PROJECTS/$SAMPLE_DATA"
 
 	local script=$1
 	shift
@@ -486,7 +486,7 @@ run_sample_data() {
 }
 
 ttd_aray() {
-	local projects=$PROJECTS
+	local projects=$TT_PROJECTS
 	local marsellus_ip=$(tt_ip marsellus)
 	local redis_ip=$(tt_ip redis)
 	local rabbit_ip=$(tt_ip rabbit)

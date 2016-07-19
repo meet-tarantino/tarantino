@@ -18,7 +18,7 @@ services:
       GF_DASHBOARDS_JSON_PATH: '/dashboards'
     volumes:
       - /etc/localtime:/etc/localtime:ro
-#      - ${PROJECTS}/grafana/grafana/app/dashboards:/dashboards:ro
+#      - ${TT_PROJECTS}/grafana/grafana/app/dashboards:/dashboards:ro
     links:
       - graphite
       - elasticsearch
@@ -57,7 +57,7 @@ services:
       - graphite
       - mongo
     volumes:
-      - ${PROJECTS}/jackie:/app:ro
+      - ${TT_PROJECTS}/jackie:/app:ro
     working_dir: /app
 
   jules:
@@ -71,5 +71,5 @@ services:
       - graphite
       - mongo
     volumes:
-      - ${PROJECTS}/jules:/app:ro
+      - ${TT_PROJECTS}/jules:/app:ro
     working_dir: /app

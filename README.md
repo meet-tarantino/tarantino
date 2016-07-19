@@ -12,7 +12,7 @@ Tarantino provides a handy set of commands for managing your platform developmen
   + viewing real-time logs from each service (`logs`)
   + destroying VMs for all services (`destroy`)
 
-By default, Tarantino will clone code into the `~/projects` directory. VMs running 360 services are executing the very files in your project directory - including any of your local modifications. The `PROJECTS` environment variable can be used to change the project directory location. It would be pretty easy to support running parallel 360 platform worlds if we wanted to.
+By default, Tarantino will clone code into the `~/projects` directory. VMs running 360 services are executing the very files in your project directory - including any of your local modifications. The `TT_PROJECTS` environment variable can be used to change the project directory location. It would be pretty easy to support running parallel 360 platform worlds if we wanted to.
 
 ## Installation
 

@@ -5,7 +5,7 @@ dc_file() {
 }
 
 dc() {
-	PROJECTS=$PROJECTS docker-compose -f $(dc_file) $*
+	TT_PROJECTS=$TT_PROJECTS docker-compose -f $(dc_file) $*
 }
 
 dc_get_links() {
