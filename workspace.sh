@@ -37,6 +37,12 @@ ws_add() {
 		echo "$alias is already registered as a workspace, please run 'tt workspace rm $alias' to remove it first"
 		return 1
 	fi
+
+	if [[ "$alias" =~ ^[0-9] ]]; then
+		echo "ERROR: workspaces with leading digits are not supported due to Docker limitations."
+		return 1
+	fi
+
 	mkdir -p $workspace_root
 	ln -sr $workspace_dir $symlink
 }
