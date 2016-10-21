@@ -42,8 +42,6 @@ tt_complete() {
 		case "$cmd" in
 		tt|"")
 			completion_base $word ;;
-		data)
-			completion_data $word ;;
 		manage)
 			completion_manage $word ;;
 		create|browse)
@@ -64,16 +62,6 @@ completion_base() {
 
 completion_workspace() {
 	echo "$WORKSPACE_COMMANDS"
-}
-completion_data() {
-	echo "$DATA_COMMANDS"
-	if ! hash jq; then
-		return 0
-	fi
-	if [ ! -d "$SAMPLE_DATA" ]; then
-		return 0
-	fi
-	tarantino sample_data_scripts 2> /dev/null
 }
 
 completion_manage() {
