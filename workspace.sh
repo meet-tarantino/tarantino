@@ -16,7 +16,7 @@ ws_usage() {
 	echo '  ls - list registered workspaces '
 	echo '  use <workspace> - switch to a different workspace'
 	echo '  current - display the current workspace and directory'
-	echo '  upgrade [workspace] - fetch latest workspace definition, update docker images'
+	echo '  upgrade [workspace] - NOT YET IMPLEMENTED: fetch latest workspace definition, update docker images'
 }
 
 ws_add() {
@@ -100,6 +100,10 @@ ws_init() {
 	else
 		init
 	fi
+}
+
+ws_upgrade() {
+	echo workspace upgrade not yet implemented.
 }
 
 init() {
