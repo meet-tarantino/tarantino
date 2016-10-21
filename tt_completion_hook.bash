@@ -8,7 +8,8 @@ _tt_complete() {
 	if [ $args -gt 2 ]; then
 		cmd=${COMP_WORDS[1]}
 	fi
-	local completions="$(/usr/local/share/tarantino/tt_completion --word "\"$cur\"" --cmd "\"$cmd\"" --args "$args")"
+#	local completions="$(/usr/local/share/tarantino/tt_completion --word "\"$cur\"" --cmd "\"$cmd\"" --args "$args")"
+	local completions="$(/home/darrenmce/meet-tarantino/tarantino/tt_completion --word "\"$cur\"" --cmd "\"$cmd\"" --args "$args")"
 	COMPREPLY=( $(compgen -W "$completions" -- "$cur") )
 }
 

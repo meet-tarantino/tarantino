@@ -105,10 +105,11 @@ ws_init() {
 init() {
 	git init
 
-	cp $TT_SHARE/templates/docker-compose.yml .
-	echo sample docker-compose.yml file created
+	cp $TT_SHARE/templates/docker-compose-projects.yml .
+	echo sample docker-compose-projects.yml file created
 
-	cp -R $TT_SHARE/templates/grafana .
+	cp $TT_SHARE/templates/docker-compose-static.yml .
+	echo sample docker-compose-static.yml file created
 }
 
 is_workspace() {
@@ -116,7 +117,7 @@ is_workspace() {
 }
 
 is_workspace_dir() {
-	if [ ! -f $1/docker-compose.yml ]; then
+	if [ ! -f $1/docker-compose-projects.yml ]; then
 		return 1
 	fi
 }

@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 
-COMMANDS="api browse check clone create data destroy grafana kue install ip logs manage npm_reinstall pull rabbit recreate restart upgrade usage"
-DATA_COMMANDS="aray ongoing"
+BASE_COMMANDS="browse check clone create dc destroy install ip manage pull recreate restart upgrade usage workspace"
 MANAGE_COMMANDS="build pull push usage"
-SAMPLE_DATA=${TT_PROJECTS:-~/projects}/sample-data
+WORKSPACE_COMMANDS="init add rm ls use current upgrade"
+
+tarantino() {
+	tt $@
+}
 
 tt_complete() {
 	local word=''
@@ -43,20 +46,25 @@ tt_complete() {
 			completion_data $word ;;
 		manage)
 			completion_manage $word ;;
-		create)
+		create|browse)
 			completion_all_services $word ;;
-		destroy|recreate|ip|browse)
+		destroy|recreate|ip)
 			completion_running_services $word ;;
 		pull|clone|check)
 			completion_services $word ;;
+		workspace)
+			completion_workspace $word;;
 		esac
 	fi
 }
 
 completion_base() {
-	echo "$COMMANDS"
+	echo "$BASE_COMMANDS"
 }
 
+completion_workspace() {
+	echo "$WORKSPACE_COMMANDS"
+}
 completion_data() {
 	echo "$DATA_COMMANDS"
 	if ! hash jq; then
@@ -65,7 +73,7 @@ completion_data() {
 	if [ ! -d "$SAMPLE_DATA" ]; then
 		return 0
 	fi
-	tt sample_data_scripts 2> /dev/null
+	tarantino sample_data_scripts 2> /dev/null
 }
 
 completion_manage() {
@@ -73,11 +81,11 @@ completion_manage() {
 }
 
 completion_all_services() {
-	tt get_all_services 2> /dev/null
+	tarantino get_all_services 2> /dev/null
 }
 
 completion_services() {
-	tt get_services 2> /dev/null
+	tarantino get_services 2> /dev/null
 }
 
 completion_running_services() {
@@ -85,7 +93,7 @@ completion_running_services() {
 	if [ ! -z "$running_ids" ]; then
 		docker inspect --format \
 			'{{index .Config.Labels "com.docker.compose.project"}} {{index .Config.Labels "com.docker.compose.service"}}' \
-			$running_ids | sed -n 's/^tarantino //p'
+			$running_ids | sed -n "s/^$(tarantino get_workspace) //p"
 	fi
 }
 

@@ -1,14 +1,11 @@
 #!/bin/bash
 
 # variables
-TT_PROJECTS=${TT_PROJECTS:-~/projects}
-
+TT_PROJECTS=${TT_PROJECTS:-~/tmp}
+GITHUB_BASE=${GITHUB_BASE:-git@github.com:meet-tarantino}
 TT_IS_GLOBAL=$([ "$0" = "/usr/local/bin/tt" ] && echo true || echo false)
 TT_SHARE=$([ $TT_IS_GLOBAL = true ] && echo /usr/local/share/tarantino || dirname $0)
 TT_HOME=${TT_HOME:-~/.tt}
-
-NOT_SERVICES_PATTERN='mongo|redis|rabbit|graphite|elasticsearch|kibana|grafana|dynamo'
-SAMPLE_DATA='sample-data'
 
 source $TT_SHARE/dc.sh
 source $TT_SHARE/install.sh
@@ -21,6 +18,10 @@ tt_get_all_services() {
 
 tt_get_services() {
 	dc_get_services
+}
+
+tt_get_workspace() {
+	get_workspace
 }
 
 info() {
@@ -93,7 +94,6 @@ tt_usage() {
 	echo '  destroy [container] - destroy all [or named] containers'
 	echo '  install - prepare environment for tarantino'
 	echo '  ip <container> - retrieve ip address of a specific container'
-	echo '  npm_reinstall - remove and reinstall all npm module dependences'
 	echo '  pull [service] - pull sources for all [or named] projects without changes'
 	echo '  recreate [container] - recreate all [or named] containers'
 	echo '  restart - restart all containers'
@@ -167,7 +167,7 @@ tt_clone() {
 	for repo in $repos; do
 		if [ ! -d "$projects/$repo" ]; then
 			echo $repo not found in projects directory $projects, cloning it.
-			git clone git@github.com:360incentives/$repo.git $projects/$repo || return 1;
+			git clone $GITHUB_BASE/$repo.git $projects/$repo || return 1;
 
 			# run npm install for any npm packages (the service, or its components)
 			find "$projects/$repo" -name 'package.json' -not -path "**/bower_components/*" | xargs --no-run-if-empty dirname | grep -v 'node_modules' | while read module; do
@@ -178,11 +178,6 @@ tt_clone() {
 		fi
 	done
 	popd &> /dev/null
-}
-
-tt_npm_reinstall() {
-	tt_module_exec rm -rf node_modules
-	tt_module_exec npm install
 }
 
 tt_pull() {
@@ -236,10 +231,6 @@ tt_module_exec() {
 		fi
 	done
 	popd
-}
-
-tt_npm() {
-	tt_module_exec npm $1
 }
 
 tt_create() {

@@ -1,0 +1,26 @@
+version: '2'
+services:
+
+  ####### example projects (https://meet-tarantino.github.io/get-started)
+
+  jackie:
+    image: mhart/alpine-node
+    command: node .
+    environment:
+      jackie_mongo__url: mongodb://mongo/jackie
+    links:
+      - mongo
+    volumes:
+      - ${TT_PROJECTS}/jackie:/app:ro
+    working_dir: /app
+
+  jules:
+    image: mhart/alpine-node
+    command: node .
+    environment:
+      jules_jackie: http://jackie:8080
+    links:
+      - jackie
+    volumes:
+      - ${TT_PROJECTS}/jules:/app:ro
+    working_dir: /app
