@@ -83,6 +83,7 @@ dc_get_repos() {
 			services=$repos
 			repos=
 			for service in $services; do
+				service=$(echo $service | grep -Ev $ALL_INFRASTRUCTURE)
 				if [ ! -z "$service" ]; then
 					repos="$repos $service"
 				fi
