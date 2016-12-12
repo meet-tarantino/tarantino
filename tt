@@ -2,7 +2,7 @@
 
 # variables
 TT_PROJECTS=${TT_PROJECTS:-~/tmp}
-GITHUB_BASE=${GITHUB_BASE:-git@github.com:meet-tarantino}
+TT_GIT_BASE=${TT_GIT_BASE:-git@github.com:meet-tarantino}
 TT_IS_GLOBAL=$([ "$0" = "/usr/local/bin/tt" ] && echo true || echo false)
 TT_SHARE=$([ $TT_IS_GLOBAL = true ] && echo /usr/local/share/tarantino || dirname $0)
 TT_HOME=${TT_HOME:-~/.tt}
@@ -167,7 +167,7 @@ tt_clone() {
 	for repo in $repos; do
 		if [ ! -d "$projects/$repo" ]; then
 			echo $repo not found in projects directory $projects, cloning it.
-			git clone $GITHUB_BASE/$repo.git $projects/$repo || return 1;
+			git clone $TT_GIT_BASE/$repo.git $projects/$repo || return 1;
 
 			# run npm install for any npm packages (the service, or its components)
 			find "$projects/$repo" -name 'package.json' -not -path "**/bower_components/*" | xargs --no-run-if-empty dirname | grep -v 'node_modules' | while read module; do
@@ -273,7 +273,7 @@ tt_restart() {
 tt_upgrade() {
 	local tmpdir=$(mktemp -d)
 	git clone git@github.com:meet-tarantino/tarantino.git $tmpdir || return 1
-	sudo echo About to launch installation. Please wait for confirmation that install is complete.
+	sudo echo "About to launch installation. Please wait for confirmation that install is complete."
 	sudo bash -c "cd $tmpdir; sleep 1s; make install" &
 }
 
