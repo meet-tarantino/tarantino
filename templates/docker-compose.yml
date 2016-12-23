@@ -3,9 +3,6 @@ services:
 
   ####### infrastructure
 
-  elasticsearch:
-    image: elasticsearch
-
   graphite:
     image: hopsoft/graphite-statsd
     ports:
@@ -29,7 +26,6 @@ services:
       jackie_mongo__url: mongodb://mongo/jackie
       jackie_stats__host: graphite
     links:
-      - elasticsearch
       - graphite
       - mongo
     volumes:
@@ -43,7 +39,6 @@ services:
       jules_jackie: http://jackie:8080
       jules_stats__host: graphite
     links:
-      - elasticsearch
       - graphite
       - mongo
     volumes:
