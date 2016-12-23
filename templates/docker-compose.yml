@@ -3,42 +3,6 @@ services:
 
   ####### infrastructure
 
-  elasticsearch:
-    image: elasticsearch
-
-  grafana:
-    build: ./grafana
-    ports:
-      - "3000:3000"
-    environment:
-      GF_AUTH_ANONYMOUS_ENABLED: 'true'
-      GF_AUTH_ANONYMOUS_ORG_NAME: 'Main Org.'
-      GF_AUTH_ANONYMOUS_ORG_ROLE: 'Admin'
-      GF_DASHBOARDS_JSON_ENABLED: 'true'
-      GF_DASHBOARDS_JSON_PATH: '/dashboards'
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-#      - ${TT_PROJECTS}/grafana/grafana/app/dashboards:/dashboards:ro
-    links:
-      - graphite
-      - elasticsearch
-
-  graphite:
-    image: hopsoft/graphite-statsd
-    ports:
-      - "80:80"
-      - "2003:2003"
-      - "8125:8125/udp"
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-
-#  kibana:
-#    build: ./kibana
-#    environment:
-#      KIBANA_SECURE: 'false'
-#    links:
-#      - elasticsearch:es
-
   mongo:
     image: mongo
     ports:
@@ -53,7 +17,6 @@ services:
       jackie_mongo__url: mongodb://mongo/jackie
       jackie_stats__host: graphite
     links:
-      - elasticsearch
       - graphite
       - mongo
     volumes:
@@ -67,7 +30,6 @@ services:
       jules_jackie: http://jackie:8080
       jules_stats__host: graphite
     links:
-      - elasticsearch
       - graphite
       - mongo
     volumes:
