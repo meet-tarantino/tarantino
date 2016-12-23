@@ -35,10 +35,10 @@ main() {
 		>&2 echo
 	fi
 
-	if [[ "$(pwd)" == *tarantino* && $TT_IS_GLOBAL = true && "$1" != "ip" ]]; then
-		>&2 echo WARNING: You\'re running global tarantino while working on tarantino locally.
-		>&2 echo
-	fi
+#	if [[ "$(pwd)" == *tarantino* && $TT_IS_GLOBAL = true && "$1" != "ip" ]]; then
+#		>&2 echo WARNING: You\'re running global tarantino while working on tarantino locally.
+#		>&2 echo
+#	fi
 
 	if [[ -z "$(get_workspace_dir)" && ! -z "$1" ]]; then
 		case "$1" in
