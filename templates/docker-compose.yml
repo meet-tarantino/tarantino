@@ -32,13 +32,6 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
 
-#  kibana:
-#    build: ./kibana
-#    environment:
-#      KIBANA_SECURE: 'false'
-#    links:
-#      - elasticsearch:es
-
   mongo:
     image: mongo
     ports:
