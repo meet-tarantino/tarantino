@@ -3,15 +3,6 @@ services:
 
   ####### infrastructure
 
-  graphite:
-    image: hopsoft/graphite-statsd
-    ports:
-      - "80:80"
-      - "2003:2003"
-      - "8125:8125/udp"
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-
   mongo:
     image: mongo
     ports:
