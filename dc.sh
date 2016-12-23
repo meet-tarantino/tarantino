@@ -60,6 +60,5 @@ dc_get_repos() {
 	fi
 	#hard-coded repos that for now will always be a dependency
 	echo gogo-templates
-	echo grafana
 	echo butch
 }

@@ -4,8 +4,7 @@ install: uninstall
 	cp tt /usr/local/bin/ && \
 		mkdir -p /usr/local/share/tarantino/templates && \
 		cp *.sh /usr/local/share/tarantino && \
-		cp templates/docker-compose.yml /usr/local/share/tarantino/templates && \
-		cp -R templates/grafana /usr/local/share/tarantino/templates && \
+		cp -R templates /usr/local/share/tarantino && \
 		cp -f tt_completion /usr/local/share/tarantino && \
 		cp -f tt_completion_hook.bash /etc/bash_completion.d/ && \
 		./tt install && \
