@@ -1,14 +1,9 @@
 #!/bin/bash
 
 # variables
-TT_PROJECTS=${TT_PROJECTS:-~/projects}
-
 TT_IS_GLOBAL=$([ "$0" = "/usr/local/bin/tt" ] && echo true || echo false)
 TT_SHARE=$([ $TT_IS_GLOBAL = true ] && echo /usr/local/share/tarantino || dirname $0)
 TT_HOME=${TT_HOME:-~/.tt}
-
-NOT_SERVICES_PATTERN='mongo|redis|rabbit|graphite|elasticsearch|kibana|grafana|dynamo'
-SAMPLE_DATA='sample-data'
 
 source $TT_SHARE/dc.sh
 source $TT_SHARE/install.sh
@@ -23,6 +18,10 @@ tt_get_services() {
 	dc_get_services
 }
 
+tt_get_workspace() {
+	get_workspace
+}
+
 info() {
 	echo INFO: $*
 }
@@ -34,10 +33,10 @@ main() {
 		>&2 echo
 	fi
 
-	if [[ "$(pwd)" == *tarantino* && $TT_IS_GLOBAL = true && "$1" != "ip" ]]; then
-		>&2 echo WARNING: You\'re running global tarantino while working on tarantino locally.
-		>&2 echo
-	fi
+#	if [[ "$(pwd)" == *tarantino* && $TT_IS_GLOBAL = true && "$1" != "ip" ]]; then
+#		>&2 echo WARNING: You\'re running global tarantino while working on tarantino locally.
+#		>&2 echo
+#	fi
 
 	if [[ -z "$(get_workspace_dir)" && ! -z "$1" ]]; then
 		case "$1" in
@@ -55,6 +54,10 @@ main() {
 			;;
 		esac
 	fi
+
+	TT_PROJECTS=${TT_PROJECTS:-~/tmp}
+	TT_GIT_BASE=${TT_GIT_BASE:-git@github.com:meet-tarantino}
+	apply_workspace_vars # this may override the above defaults
 
 	run_sub_command tt $@
 }
@@ -93,7 +96,6 @@ tt_usage() {
 	echo '  destroy [container] - destroy all [or named] containers'
 	echo '  install - prepare environment for tarantino'
 	echo '  ip <container> - retrieve ip address of a specific container'
-	echo '  npm_reinstall - remove and reinstall all npm module dependences'
 	echo '  pull [service] - pull sources for all [or named] projects without changes'
 	echo '  recreate [container] - recreate all [or named] containers'
 	echo '  restart - restart all containers'
@@ -167,7 +169,7 @@ tt_clone() {
 	for repo in $repos; do
 		if [ ! -d "$projects/$repo" ]; then
 			echo $repo not found in projects directory $projects, cloning it.
-			git clone git@github.com:360incentives/$repo.git $projects/$repo || return 1;
+			git clone $TT_GIT_BASE/$repo.git $projects/$repo || return 1;
 
 			# run npm install for any npm packages (the service, or its components)
 			find "$projects/$repo" -name 'package.json' -not -path "**/bower_components/*" | xargs --no-run-if-empty dirname | grep -v 'node_modules' | while read module; do
@@ -178,11 +180,6 @@ tt_clone() {
 		fi
 	done
 	popd &> /dev/null
-}
-
-tt_npm_reinstall() {
-	tt_module_exec rm -rf node_modules
-	tt_module_exec npm install
 }
 
 tt_pull() {
@@ -238,10 +235,6 @@ tt_module_exec() {
 	popd
 }
 
-tt_npm() {
-	tt_module_exec npm $1
-}
-
 tt_create() {
 	if ! tt_check $@; then
 		echo "NOTE: You must clone service repositories before creating containers; otherwise, empty root-privilege directories would be created and that's poop."
@@ -282,7 +275,7 @@ tt_restart() {
 tt_upgrade() {
 	local tmpdir=$(mktemp -d)
 	git clone git@github.com:meet-tarantino/tarantino.git $tmpdir || return 1
-	sudo echo About to launch installation. Please wait for confirmation that install is complete.
+	sudo echo "About to launch installation. Please wait for confirmation that install is complete."
 	sudo bash -c "cd $tmpdir; sleep 1s; make install" &
 }
 

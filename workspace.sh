@@ -10,13 +10,13 @@ ws_usage() {
 	echo
 	echo commands:
 	echo
-	echo '  init - initialize a new workspace in the current directory'
+	echo '  init [alias (default is directory name)] - initialize a new workspace in the current directory'
 	echo '  add <alias> <workspace_dir> - register an existing workspace with your user account'
 	echo '  rm <workspace> - unregister a workspace from your user account'
 	echo '  ls - list registered workspaces '
 	echo '  use <workspace> - switch to a different workspace'
 	echo '  current - display the current workspace and directory'
-	echo '  upgrade [workspace] - fetch latest workspace definition, update docker images'
+	echo '  upgrade [workspace] - NOT YET IMPLEMENTED: fetch latest workspace definition, update docker images'
 }
 
 ws_add() {
@@ -45,6 +45,7 @@ ws_add() {
 
 	mkdir -p $workspace_root
 	ln -sr $workspace_dir $symlink
+	echo $alias workspace added
 }
 
 ws_rm() {
@@ -83,32 +84,53 @@ ws_use() {
 		return 1
 	fi
 	ln -snf $TT_HOME/workspaces/$alias $TT_HOME/current
+	ws_current
 }
 
 ws_current() {
-	echo $(get_workspace) '->' $(readlink -f "$(get_workspace_dir)")
+	echo Current Workspace: $(get_workspace) '->' $(readlink -f "$(get_workspace_dir)")
 }
 
 ws_init() {
 	if is_workspace_dir $(pwd); then
-		local warning='Directory is already a workspace, are you sure you wish to reinitialize? (y/N)? '
-		read -n 1 -p "$warning" CONFIRM
-		if [ "$CONFIRM" = 'y' ]; then
-			echo
-			init
-		fi
+		echo 'Directory already contains a workspace!'
+		echo 'to reinitialize: '
+		echo ' - remove this first using `tt workspace rm <workspace>`'
+		echo ' - delete the contents of the folder'
+		return 1
 	else
-		init
+		init $@
 	fi
 }
 
+ws_upgrade() {
+	echo workspace upgrade not yet implemented.
+}
+
 init() {
+	alias=$(basename `pwd`)
+	if [ ! -z $1 ]; then
+		alias=$1
+	fi
+
+	if $(is_workspace $alias); then
+		echo "Error: a workspace with the name $alias already exists."
+		return 1
+	fi
+
 	git init
 
-	cp $TT_SHARE/templates/docker-compose.yml .
-	echo sample docker-compose.yml file created
+	cp $TT_SHARE/templates/docker-compose-projects.yml .
+	echo sample docker-compose-projects.yml file created
 
-	cp -R $TT_SHARE/templates/grafana .
+	cp $TT_SHARE/templates/docker-compose-static.yml .
+	echo sample docker-compose-static.yml file created
+
+	cp $TT_SHARE/templates/ttvars.sh .
+	echo sample ttvars.sh created
+
+	ws_add $alias `pwd`
+	ws_use $alias
 }
 
 is_workspace() {
@@ -116,7 +138,7 @@ is_workspace() {
 }
 
 is_workspace_dir() {
-	if [ ! -f $1/docker-compose.yml ]; then
+	if [ ! -f $1/docker-compose-projects.yml ]; then
 		return 1
 	fi
 }
@@ -127,4 +149,12 @@ get_workspace_dir() {
 
 get_workspace() {
 	basename "$(get_workspace_dir)"
+}
+
+apply_workspace_vars() {
+	varsFile="$(get_workspace_dir)/ttvars.sh"
+	if [ ! -f $varsFile ]; then
+		return 0;
+	fi
+	source $varsFile
 }

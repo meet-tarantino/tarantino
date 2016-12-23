@@ -1,0 +1,9 @@
+version: '2'
+services:
+
+  ####### example static images (no git-backed volume mount)
+  ####### typically used for infrastructure-type such as databases, etc.
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
