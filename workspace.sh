@@ -114,6 +114,9 @@ init() {
 
 	cp $TT_SHARE/templates/docker-compose-static.yml .
 	echo sample docker-compose-static.yml file created
+
+	cp $TT_SHARE/templates/ttvars.sh .
+	echo sample ttvars.sh created
 }
 
 is_workspace() {
@@ -132,4 +135,12 @@ get_workspace_dir() {
 
 get_workspace() {
 	basename "$(get_workspace_dir)"
+}
+
+apply_workspace_vars() {
+	varsFile="$(get_workspace_dir)/ttvars.sh"
+	if [ ! -f $varsFile ]; then
+		return 0;
+	fi
+	source $varsFile
 }
