@@ -2,6 +2,7 @@
 
 # variables
 TT_PROJECTS=${TT_PROJECTS:-~/projects}
+TT_GIT_BASE=${TT_GIT_BASE:-git@gitub.com:meet-tarantino}
 
 TT_IS_GLOBAL=$([ "$0" = "/usr/local/bin/tt" ] && echo true || echo false)
 TT_SHARE=$([ $TT_IS_GLOBAL = true ] && echo /usr/local/share/tarantino || dirname $0)
@@ -167,7 +168,7 @@ tt_clone() {
 	for repo in $repos; do
 		if [ ! -d "$projects/$repo" ]; then
 			echo $repo not found in projects directory $projects, cloning it.
-			git clone git@github.com:360incentives/$repo.git $projects/$repo || return 1;
+			git clone $TT_GIT_BASE/$repo.git $projects/$repo || return 1;
 
 			# run npm install for any npm packages (the service, or its components)
 			find "$projects/$repo" -name 'package.json' -not -path "**/bower_components/*" | xargs --no-run-if-empty dirname | grep -v 'node_modules' | while read module; do
