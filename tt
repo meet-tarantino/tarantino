@@ -94,7 +94,6 @@ tt_usage() {
 	echo '  destroy [container] - destroy all [or named] containers'
 	echo '  install - prepare environment for tarantino'
 	echo '  ip <container> - retrieve ip address of a specific container'
-	echo '  npm_reinstall - remove and reinstall all npm module dependences'
 	echo '  pull [service] - pull sources for all [or named] projects without changes'
 	echo '  recreate [container] - recreate all [or named] containers'
 	echo '  restart - restart all containers'
@@ -181,11 +180,6 @@ tt_clone() {
 	popd &> /dev/null
 }
 
-tt_npm_reinstall() {
-	tt_module_exec rm -rf node_modules
-	tt_module_exec npm install
-}
-
 tt_pull() {
 	local projects=$TT_PROJECTS
 	local repos=$(dc_get_repos $*)
@@ -237,10 +231,6 @@ tt_module_exec() {
 		fi
 	done
 	popd
-}
-
-tt_npm() {
-	tt_module_exec npm $1
 }
 
 tt_create() {

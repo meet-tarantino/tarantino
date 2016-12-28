@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-COMMANDS="api browse check clone create data destroy kue install ip logs manage npm_reinstall pull rabbit recreate restart upgrade usage"
+COMMANDS="api browse check clone create data destroy kue install ip logs manage pull rabbit recreate restart upgrade usage"
 DATA_COMMANDS="aray ongoing"
 MANAGE_COMMANDS="build pull push usage"
 SAMPLE_DATA=${TT_PROJECTS:-~/projects}/sample-data
