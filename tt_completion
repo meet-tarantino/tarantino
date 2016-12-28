@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 
-COMMANDS="api browse check clone create destroy kue install ip logs manage pull rabbit recreate restart upgrade usage"
-DATA_COMMANDS="aray ongoing"
-MANAGE_COMMANDS="build pull push usage"
+BASE_COMMANDS="browse check clone create dc destroy install ip pull recreate restart upgrade usage workspace"
+WORKSPACE_COMMANDS="init add rm ls use current upgrade"
+
+tarantino() {
+	tt $@
+}
 
 tt_complete() {
 	local word=''
@@ -38,32 +41,28 @@ tt_complete() {
 		case "$cmd" in
 		tt|"")
 			completion_base $word ;;
-		manage)
-			completion_manage $word ;;
-		create)
+		create|browse)
 			completion_all_services $word ;;
-		destroy|recreate|ip|browse)
+		destroy|recreate|ip)
 			completion_running_services $word ;;
 		pull|clone|check)
 			completion_services $word ;;
+		workspace)
+			completion_workspace $word ;;
 		esac
 	fi
 }
 
 completion_base() {
-	echo "$COMMANDS"
-}
-
-completion_manage() {
-	echo "$MANAGE_COMMANDS"
+	echo "$BASE_COMMANDS"
 }
 
 completion_all_services() {
-	tt get_all_services 2> /dev/null
+	tarantino get_all_services 2> /dev/null
 }
 
 completion_services() {
-	tt get_services 2> /dev/null
+	tarantino get_services 2> /dev/null
 }
 
 completion_running_services() {
@@ -71,8 +70,12 @@ completion_running_services() {
 	if [ ! -z "$running_ids" ]; then
 		docker inspect --format \
 			'{{index .Config.Labels "com.docker.compose.project"}} {{index .Config.Labels "com.docker.compose.service"}}' \
-			$running_ids | sed -n 's/^tarantino //p'
+			$running_ids | sed -n "s/^$(tarantino get_workspace) //p"
 	fi
+}
+
+completion_workspace() {
+	echo "$WORKSPACE_COMMANDS"
 }
 
 tt_complete $@
