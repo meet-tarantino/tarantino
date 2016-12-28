@@ -15,7 +15,6 @@ services:
     command: node .
     environment:
       jackie_mongo__url: mongodb://mongo/jackie
-      jackie_stats__host: graphite
     links:
       - mongo
     volumes:
@@ -27,7 +26,6 @@ services:
     command: node .
     environment:
       jules_jackie: http://jackie:8080
-      jules_stats__host: graphite
     links:
       - mongo
     volumes:
