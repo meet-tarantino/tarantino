@@ -17,7 +17,6 @@ services:
       jackie_mongo__url: mongodb://mongo/jackie
       jackie_stats__host: graphite
     links:
-      - graphite
       - mongo
     volumes:
       - ${TT_PROJECTS}/jackie:/app:ro
@@ -30,7 +29,6 @@ services:
       jules_jackie: http://jackie:8080
       jules_stats__host: graphite
     links:
-      - graphite
       - mongo
     volumes:
       - ${TT_PROJECTS}/jules:/app:ro
