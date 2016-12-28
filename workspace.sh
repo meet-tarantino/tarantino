@@ -104,6 +104,7 @@ ws_init() {
 
 init() {
 	git init
+	cp $TT_SHARE/templates/.gitignore .
 
 	cp $TT_SHARE/templates/docker-compose.yml .
 	echo sample docker-compose.yml file created
