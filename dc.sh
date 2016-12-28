@@ -22,7 +22,7 @@ dc_get_links() {
 }
 
 dc_get_all_services() {
-	if [ "$TT_IS_GLOBAL" = true -a -f "$ALL_SERVICES_FILE" ]; then
+	if [ "$TT_IS_GLOBAL" = true ]; then
 		generate_service_lists
 		cat "$(get_workspace_cache_dir)/services"
 	else
