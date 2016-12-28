@@ -213,25 +213,6 @@ tt_pull() {
 	popd
 }
 
-tt_module_exec() {
-	local projects=$TT_PROJECTS
-	local services=$(tt_get_services)
-	local operation=$@
-	local success=true
-
-	pushd .
-	for service in $services; do
-		if [ -d "$projects/$service" ]; then
-			find $projects/$service -name 'package.json' -not -path "**/bower_components/*" | xargs dirname | grep -v 'node_modules' | while read module; do
-				echo in $module directory running: $operation
-				cd $module
-				$operation
-			done
-		fi
-	done
-	popd
-}
-
 tt_create() {
 	if ! tt_check $@; then
 		echo "NOTE: You must clone service repositories before creating containers; otherwise, empty root-privilege directories would be created and that's poop."
