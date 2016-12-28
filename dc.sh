@@ -23,7 +23,8 @@ dc_get_links() {
 
 dc_get_all_services() {
 	if [ "$TT_IS_GLOBAL" = true -a -f "$ALL_SERVICES_FILE" ]; then
-		cat "$ALL_SERVICES_FILE"
+		generate_service_lists
+		cat "$(get_workspace_cache_dir)/services"
 	else
 		dc config --services
 	fi
@@ -58,4 +59,25 @@ dc_get_repos() {
 	else
 		echo "$(tt_get_services)"
 	fi
+}
+
+get_workspace_cache_dir() {
+	local cachedir=$(get_workspace_dir)/.cache
+	mkdir -p $cachedir
+	echo $cachedir
+}
+
+generate_service_lists() {
+	local md5check=$(get_workspace_cache_dir)/dc_file.md5
+
+	if [ -f "$md5check" ]; then
+		if $(md5sum -c "$md5check" --status); then
+			return 0
+		fi
+	fi
+
+	local services_cache_file=$(get_workspace_cache_dir)/services
+	dc config --services > "$services_cache_file"
+
+	md5sum "$(dc_file)" > "$md5check"
 }
