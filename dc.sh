@@ -58,7 +58,4 @@ dc_get_repos() {
 	else
 		echo "$(tt_get_services)"
 	fi
-	#hard-coded repos that for now will always be a dependency
-	echo gogo-templates
-	echo butch
 }
