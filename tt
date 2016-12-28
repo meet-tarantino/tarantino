@@ -9,7 +9,6 @@ TT_SHARE=$([ $TT_IS_GLOBAL = true ] && echo /usr/local/share/tarantino || dirnam
 TT_HOME=${TT_HOME:-~/.tt}
 
 NOT_SERVICES_PATTERN='mongo|redis|rabbit'
-SAMPLE_DATA='sample-data'
 
 source $TT_SHARE/dc.sh
 source $TT_SHARE/install.sh
