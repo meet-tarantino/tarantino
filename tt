@@ -134,12 +134,12 @@ tt_browse() {
 
 tt_check() {
 	local projects=$TT_PROJECTS
-	local repos=$(dc_get_repos $*)
+	local service=$(dc_get_service_and_dependencies_with_source $@)
 	local success=true
 
-	for repo in $repos; do
-		if [ ! -d "$projects/$repo" ]; then
-			echo $repo not found in projects directory $projects.
+	for service in $service; do
+		if [ ! -d "$projects/$service" ]; then
+			echo $service not found in projects directory $projects.
 			success=false
 		fi
 	done
@@ -181,7 +181,7 @@ tt_clone() {
 
 tt_pull() {
 	local projects=$TT_PROJECTS
-	local repos=$(dc_get_repos $*)
+	local services=$(dc_get_service_and_dependencies_with_source $@)
 
 	local skipped=
 	local updated=
@@ -189,21 +189,21 @@ tt_pull() {
 	local current=
 
 	pushd .
-	for repo in $repos; do
-		if [ -d "$projects/$repo" ]; then
-			cd $projects/$repo
-			echo ---- $repo ----
+	for service in $services; do
+		if [ -d "$projects/$service" ]; then
+			cd $projects/$service
+			echo ---- $service ----
 			if [ "$(git status --porcelain | wc -c)" = "0" ]; then
 				current=$(git rev-parse HEAD)
 				git pull --rebase --ff-only
 				if [ $? -ne 0 ]; then
-					skipped="$skipped $repo"
+					skipped="$skipped $service"
 				elif [ $current != "$(git rev-parse HEAD)" ]; then
-					updated="$updated $repo"
+					updated="$updated $service"
 				fi
 			else
-				echo Skipping $repo because the working directory is not clean.
-				skipped="$skipped $repo"
+				echo Skipping $service because the working directory is not clean.
+				skipped="$skipped $service"
 			fi
 		fi
 	done

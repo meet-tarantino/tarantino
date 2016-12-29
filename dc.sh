@@ -25,11 +25,6 @@ dc_get_services_with_source() {
 	dc_get_sources | sed -e 's/^\[\(.*\)\]=.*$/\1/'
 }
 
-# TODO: remove this once references are updated to dc_get_service_and_dependencies_with_source
-dc_get_repos() {
-	dc_get_service_and_dependencies_with_source $@
-}
-
 dc_get_service_and_dependencies_with_source() {
 	# intersect service & dependencies with source backed services
 	sort <(dc_get_service_and_dependencies $@) <(dc_get_services_with_source) | uniq -d
