@@ -20,6 +20,8 @@ services:
     volumes:
       - ${TT_PROJECTS}/jackie:/app:ro
     working_dir: /app
+    labels:
+      com.tarantino.source: git@github.com:meet-tarantino/jackie.git
 
   jules:
     image: mhart/alpine-node
@@ -28,6 +30,9 @@ services:
       jules_jackie: http://jackie:8080
     links:
       - mongo
+      - jackie
     volumes:
       - ${TT_PROJECTS}/jules:/app:ro
     working_dir: /app
+    labels:
+      com.tarantino.source: git@github.com:meet-tarantino/jules.git
