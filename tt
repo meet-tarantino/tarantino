@@ -154,23 +154,28 @@ tt_check() {
 
 tt_clone() {
 	local projects=$TT_PROJECTS
-	local repos=$(dc_get_repos $*)
-	local success=true
+	local services=$(dc_get_service_and_dependencies $@)
+	eval "declare -A TT_SOURCES=($(dc_get_sources))" # sources hashtable
 
 	pushd . &> /dev/null
-	for repo in $repos; do
-		if [ ! -d "$projects/$repo" ]; then
-			echo $repo not found in projects directory $projects, cloning it.
-			git clone $TT_GIT_BASE/$repo.git $projects/$repo || return 1;
+
+	for service in $services; do
+		local src=${TT_SOURCES[$service]}
+
+		# if source is defined but directory doesn't exist
+		if [ ! -z "$src" -a ! -d "$projects/$service" ]; then
+			echo $service not found in projects directory $projects, cloning it.
+			git clone $src $projects/$service || return 1;
 
 			# run npm install for any npm packages (the service, or its components)
-			find "$projects/$repo" -name 'package.json' -not -path "**/bower_components/*" | xargs --no-run-if-empty dirname | grep -v 'node_modules' | while read module; do
+			find "$projects/$service" -name 'package.json' -not -path "**/bower_components/*" | xargs --no-run-if-empty dirname | grep -v 'node_modules' | while read module; do
 				cd $module
 				echo in $module directory running: npm install
 				npm install
 			done
 		fi
 	done
+
 	popd &> /dev/null
 }
 

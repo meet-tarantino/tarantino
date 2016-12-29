@@ -22,8 +22,7 @@ dc_get_links() {
 }
 
 dc_get_services_with_source() {
-	# pluck out service names only
-	dc_get_sources | sed -e 's/^\(.*\)=.*$/\1/'
+	dc_get_sources | sed -e 's/^\[\(.*\)\]=.*$/\1/'
 }
 
 # TODO: remove this once references are updated to dc_get_service_and_dependencies_with_source
@@ -106,5 +105,5 @@ generate_compose_file_caches() {
 parse_sources() {
 	parse_yaml $(dc_file) |
 		grep '^services_.*_labels_com.tarantino.source=' |
-		sed -e 's/^services_\(.*\)_labels_com.tarantino.source=/\1=/'
+		sed -e 's/^services_\(.*\)_labels_com.tarantino.source=(\(.*\))$/[\1]=\2/'
 }
