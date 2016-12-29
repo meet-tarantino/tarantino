@@ -19,8 +19,8 @@ tt_get_all_services() {
 	dc_get_all_services
 }
 
-tt_get_services() {
-	dc_get_services
+tt_get_services_with_source() {
+	dc_get_services_with_source
 }
 
 info() {

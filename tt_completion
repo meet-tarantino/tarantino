@@ -62,7 +62,7 @@ completion_all_services() {
 }
 
 completion_services() {
-	tarantino get_services 2> /dev/null
+	tarantino get_services_with_source 2> /dev/null
 }
 
 completion_running_services() {

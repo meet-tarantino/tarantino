@@ -26,11 +26,6 @@ dc_get_all_services() {
 	get_services
 }
 
-# TODO: remove this once references are updated to dc_get_services_with_source
-dc_get_services() {
-	dc_get_services_with_source
-}
-
 dc_get_services_with_source() {
 	# pluck out service names only
 	dc_get_sources | sed -e 's/^\(.*\)=.*$/\1/'
