@@ -15,8 +15,8 @@ source $TT_SHARE/install.sh
 source $TT_SHARE/parse-yaml.sh
 source $TT_SHARE/workspace.sh
 
-tt_get_all_services() {
-	dc_get_all_services
+tt_get_services() {
+	dc_get_services
 }
 
 tt_get_services_with_source() {

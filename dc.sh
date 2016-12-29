@@ -21,11 +21,6 @@ dc_get_links() {
 	done
 }
 
-# TODO: remove this once references are updated to dc_get_services
-dc_get_all_services() {
-	get_services
-}
-
 dc_get_services_with_source() {
 	# pluck out service names only
 	dc_get_sources | sed -e 's/^\(.*\)=.*$/\1/'
@@ -62,7 +57,7 @@ dc_get_service_and_dependencies() {
 			echo "$result"
 		fi
 	else
-		echo "$(get_services)"
+		echo "$(dc_get_services)"
 	fi
 }
 
@@ -72,8 +67,7 @@ get_workspace_cache_dir() {
 	echo $cachedir
 }
 
-# TODO: rename this to dc_get_services
-get_services() {
+dc_get_services() {
 	if [ "$TT_IS_GLOBAL" = true ]; then
 		generate_compose_file_caches
 		cat "$(get_workspace_cache_dir)/services"

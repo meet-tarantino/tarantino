@@ -58,7 +58,7 @@ completion_base() {
 }
 
 completion_all_services() {
-	tarantino get_all_services 2> /dev/null
+	tarantino get_services 2> /dev/null
 }
 
 completion_services() {
