@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-BASE_COMMANDS="browse check clone create dc destroy install ip pull recreate restart upgrade usage workspace"
+BASE_COMMANDS="browse check clone create dc destroy install ip logs pull recreate restart upgrade usage workspace"
 WORKSPACE_COMMANDS="init add rm ls use current upgrade"
 
 tarantino() {
@@ -31,7 +31,7 @@ tt_complete() {
 		case "$cmd" in
 		create)
 			completion_all_services $word ;;
-		destroy|recreate)
+		destroy|recreate|logs)
 			completion_running_services $word ;;
 		pull|clone|check)
 			completion_services $word ;;
@@ -43,7 +43,7 @@ tt_complete() {
 			completion_base $word ;;
 		create|browse)
 			completion_all_services $word ;;
-		destroy|recreate|ip)
+		destroy|recreate|ip|logs)
 			completion_running_services $word ;;
 		pull|clone|check)
 			completion_services $word ;;

@@ -87,6 +87,7 @@ tt_usage() {
 	echo '  destroy [container...] - destroy all [or named] containers'
 	echo '  install - prepare environment for tarantino'
 	echo '  ip <container> - retrieve ip address of a specific container'
+	echo '  logs [container...] - show docker compose logs for all [or named] services'
 	echo '  pull [service] - pull sources for all [or named] projects without changes'
 	echo '  recreate [container...] - recreate all [or named] containers'
 	echo '  restart - restart all containers'
@@ -254,6 +255,10 @@ tt_upgrade() {
 	git clone git@github.com:meet-tarantino/tarantino.git $tmpdir || return 1
 	sudo echo "About to launch installation. Please wait for confirmation that install is complete."
 	sudo bash -c "cd $tmpdir; sleep 1s; make install" &
+}
+
+tt_logs() {
+	dc logs -f $@
 }
 
 main $@
