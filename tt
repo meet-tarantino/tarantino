@@ -31,7 +31,8 @@ main() {
 		>&2 echo
 	fi
 
-	if [[ -z "$(get_workspace_dir)" && ! -z "$1" ]]; then
+	local workspace_dir=$(get_workspace_dir)
+	if [[ -z "$workspace_dir" && ! -z "$1" ]]; then
 		case "$1" in
 		install) ;;
 		upgrade) ;;
@@ -46,6 +47,14 @@ main() {
 			return 1
 			;;
 		esac
+	else
+		## load workspace plugins
+		if [ -d "$workspace_dir/plugins" ]; then
+			for plugin in $(find "$workspace_dir/plugins" -name *.sh)
+			do
+				source $plugin
+			done
+		fi
 	fi
 
 	run_sub_command tt $@

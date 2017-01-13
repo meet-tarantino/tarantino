@@ -113,6 +113,9 @@ init() {
 
 	cp $TT_SHARE/templates/docker-compose.yml .
 	echo sample docker-compose.yml file created
+
+	cp -r $TT_SHARE/templates/plugins .
+	echo sample plugin created
 }
 
 is_workspace() {
