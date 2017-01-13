@@ -256,4 +256,8 @@ tt_upgrade() {
 	sudo bash -c "cd $tmpdir; sleep 1s; make install" &
 }
 
+tt_get_workspace() {
+	get_workspace
+}
+
 main $@
