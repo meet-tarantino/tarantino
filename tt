@@ -50,7 +50,7 @@ main() {
 	else
 		## load workspace plugins
 		if [ -d "$workspace_dir/plugins" ]; then
-			for plugin in $(find "$workspace_dir/plugins" -name *.sh)
+			for plugin in $(find "$workspace_dir/plugins" -name '*.sh')
 			do
 				source $plugin
 			done
