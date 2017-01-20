@@ -98,7 +98,7 @@ generate_compose_file_caches() {
 }
 
 parse_sources() {
-	parse_yaml $(dc_file) |
+	dc config | parse_yaml |
 		grep '^services_.*_labels_com.tarantino.source=' |
 		sed -e 's/^services_\(.*\)_labels_com.tarantino.source=(\(.*\))$/[\1]=\2/'
 }
