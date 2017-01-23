@@ -14,6 +14,8 @@ dc() {
 
 dc_get_links() {
 	local key=services_"$1"_links
+	# `docker-compose config` output wreaks havoc with list indentation,
+	# until we find a non-hack way to deal with this, parse file directly
 	parse_yaml $(dc_file) | sed -ne "s|$key+=(\"\(.*\)\")|\1|p"
 }
 
