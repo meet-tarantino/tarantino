@@ -14,11 +14,7 @@ dc() {
 
 dc_get_links() {
 	local key=services_"$1"_links
-	local links=$key[@]
-	eval $(parse_yaml $(dc_file) | grep $key)
-	for link in ${!links}; do
-		echo $link
-	done
+	parse_yaml $(dc_file) | sed -ne "s|$key+=(\"\(.*\)\")|\1|p"
 }
 
 dc_get_services_with_source() {
