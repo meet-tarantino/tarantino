@@ -14,11 +14,9 @@ dc() {
 
 dc_get_links() {
 	local key=services_"$1"_links
-	local links=$key[@]
-	eval $(parse_yaml $(dc_file) | grep $key)
-	for link in ${!links}; do
-		echo $link
-	done
+	# `docker-compose config` output wreaks havoc with list indentation,
+	# until we find a non-hack way to deal with this, parse file directly
+	parse_yaml $(dc_file) | sed -ne "s|$key+=(\"\(.*\)\")|\1|p"
 }
 
 dc_get_services_with_source() {
@@ -88,6 +86,9 @@ generate_compose_file_caches() {
 		fi
 	fi
 
+	local yaml_cache_file=$(get_workspace_cache_dir)/yaml
+	dc config > "$yaml_cache_file"
+
 	local services_cache_file=$(get_workspace_cache_dir)/services
 	dc config --services > "$services_cache_file"
 
@@ -97,8 +98,17 @@ generate_compose_file_caches() {
 	md5sum "$(dc_file)" > "$md5check"
 }
 
+get_compose_yaml() {
+	if [ "$TT_IS_GLOBAL" = true ]; then
+		generate_compose_file_caches
+		cat "$(get_workspace_cache_dir)/yaml"
+	else
+		dc config
+	fi
+}
+
 parse_sources() {
-	dc config | parse_yaml |
+	get_compose_yaml | parse_yaml |
 		grep '^services_.*_labels_com.tarantino.source=' |
 		sed -e 's/^services_\(.*\)_labels_com.tarantino.source=(\(.*\))$/[\1]=\2/'
 }
