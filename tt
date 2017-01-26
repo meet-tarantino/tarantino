@@ -20,6 +20,10 @@ tt_get_services_with_source() {
 	dc_get_services_with_source
 }
 
+tt_get_available_workspaces() {
+	ws_ls
+}
+
 info() {
 	echo INFO: $*
 }
