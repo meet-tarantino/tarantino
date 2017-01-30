@@ -69,16 +69,14 @@ dc_get_services() {
 }
 
 dc_get_sources() {
-	if [ "$TT_IS_GLOBAL" = true ]; then
-		generate_compose_file_caches
-		cat "$(get_workspace_cache_dir)/sources"
-	else
-		parse_sources
-	fi
+    get_compose_yaml | parse_yaml |
+		grep '^services_.*_labels_com.tarantino.source=' |
+		sed -e 's/^services_\(.*\)_labels_com.tarantino.source=(\(.*\))$/[\1]=\2/'
 }
 
 generate_compose_file_caches() {
-	local md5check=$(get_workspace_cache_dir)/dc_file.md5
+	local cachedir=$(get_workspace_cache_dir)
+	local md5check=$cachedir/dc_file.md5
 
 	if [ -f "$md5check" ]; then
 		if $(md5sum -c "$md5check" --status); then
@@ -86,14 +84,11 @@ generate_compose_file_caches() {
 		fi
 	fi
 
-	local yaml_cache_file=$(get_workspace_cache_dir)/yaml
+	local yaml_cache_file=$cachedir/yaml
 	dc config > "$yaml_cache_file"
 
-	local services_cache_file=$(get_workspace_cache_dir)/services
+	local services_cache_file=$cachedir/services
 	dc config --services > "$services_cache_file"
-
-	local sources_cache_file=$(get_workspace_cache_dir)/sources
-	parse_sources > $sources_cache_file
 
 	md5sum "$(dc_file)" > "$md5check"
 }
@@ -107,8 +102,3 @@ get_compose_yaml() {
 	fi
 }
 
-parse_sources() {
-	get_compose_yaml | parse_yaml |
-		grep '^services_.*_labels_com.tarantino.source=' |
-		sed -e 's/^services_\(.*\)_labels_com.tarantino.source=(\(.*\))$/[\1]=\2/'
-}

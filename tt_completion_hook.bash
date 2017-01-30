@@ -3,12 +3,12 @@
 _tt_complete() {
 	COMPREPLY=()
 	local cur="${COMP_WORDS[COMP_CWORD]}"
-	local args=${#COMP_WORDS[@]}
-	local cmd=
-	if [ $args -gt 2 ]; then
-		cmd=${COMP_WORDS[1]}
+	local completions=
+	if [ ! -z $cur ]; then
+		completions="$(/usr/local/share/tarantino/tt_completion "${COMP_WORDS[@]:1}")"
+	else
+		completions="$(/usr/local/share/tarantino/tt_completion -n "${COMP_WORDS[@]:1}")"
 	fi
-	local completions="$(/usr/local/share/tarantino/tt_completion --word "\"$cur\"" --cmd "\"$cmd\"" --args "$args")"
 	COMPREPLY=( $(compgen -W "$completions" -- "$cur") )
 }
 

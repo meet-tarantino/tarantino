@@ -8,37 +8,40 @@ tarantino() {
 }
 
 tt_complete() {
-	local word=''
-	local cmd=''
-	local args=0
-	while [[ $# -gt 1 ]]; do
-		case "$1" in
-		-w|--word)
-			word=`echo $2 | tr -d "\""`
-			shift ;;
-		-c|--cmd)
-			cmd=`echo $2 | tr -d "\""`
-			shift ;;
-		-a|--args)
-			args=$2
-			shift ;;
-		esac
-		shift
-	done
+	local word=
+	local cmds=
+	if [ $1 == '-n' ]; then
+		shift;
+		word=
+		cmds=($@)
+	else
+		word=${@: -1}
+		cmds=(${@:1:$#-1})
+	fi
 
-	if [ $args -gt 3 ]; then
-		#multi arg case
-		case "$cmd" in
+	local basecmd=${cmds[0]}
+	local numcmds=${#cmds[@]}
+
+	if [ $numcmds -gt 1 ]; then
+		#multi cmd case
+		case "$basecmd" in
 		create)
 			completion_all_services $word ;;
 		destroy|recreate)
 			completion_running_services $word ;;
 		pull|clone|check)
 			completion_services $word ;;
+		workspace)
+			if [ $numcmds -eq 2 ]; then
+				case "${cmds[1]}" in
+				use|rm)
+					completion_available_workspaces $word ;;
+				esac
+			fi
 		esac
 	else
 		#single arg case
-		case "$cmd" in
+		case "$basecmd" in
 		tt|"")
 			completion_base $word ;;
 		create|browse)
@@ -76,6 +79,10 @@ completion_running_services() {
 
 completion_workspace() {
 	echo "$WORKSPACE_COMMANDS"
+}
+
+completion_available_workspaces() {
+	tarantino get_available_workspaces 2> /dev/null
 }
 
 tt_complete $@
