@@ -91,15 +91,15 @@ ws_current() {
 
 ws_init() {
 	if is_workspace_dir $(pwd); then
-		local warning='Directory is already a workspace, are you sure you wish to reinitialize? (y/N)? '
-		read -n 1 -p "$warning" CONFIRM
-		if [ "$CONFIRM" = 'y' ]; then
-			echo
-			init
-		fi
-	else
-		init
+		echo 'Directory already contains a workspace!'
+		echo 'to reinitialize: '
+		echo ' - remove this first using `tt workspace rm <workspace>`'
+		echo ' - delete the contents of the folder'
+		echo ' - run `tt init` again'
+		return 1
 	fi
+
+	init $@
 }
 
 ws_upgrade() {
@@ -108,6 +108,16 @@ ws_upgrade() {
 }
 
 init() {
+	alias=$(basename `pwd`)
+	if [ ! -z $1 ]; then
+		alias=$1
+	fi
+
+	if $(is_workspace $alias); then
+		echo "Error: a workspace with the name '$alias' already exists"
+		return 1
+	fi
+
 	git init
 	cp $TT_SHARE/templates/.gitignore .
 
@@ -116,6 +126,9 @@ init() {
 
 	cp -r $TT_SHARE/templates/plugins .
 	echo sample plugin created
+
+	ws_add $alias `pwd`
+	ws_use $alias
 }
 
 is_workspace() {
