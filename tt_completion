@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 BASE_COMMANDS="browse check clone create dc destroy install ip pull recreate restart upgrade usage workspace"
-WORKSPACE_COMMANDS="init add rm ls use current upgrade"
+WORKSPACE_COMMANDS="init add edit rm ls use current upgrade"
 
 tarantino() {
 	tt $@
