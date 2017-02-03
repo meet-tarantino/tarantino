@@ -12,6 +12,7 @@ ws_usage() {
 	echo
 	echo '  init - initialize a new workspace in the current directory'
 	echo '  add <alias> <workspace_dir> - register an existing workspace with your user account'
+	echo '  edit - opens the current workspace docker-compose.yml for editing'
 	echo '  rm <workspace> - unregister a workspace from your user account'
 	echo '  ls - list registered workspaces '
 	echo '  use <workspace> - switch to a different workspace'
@@ -83,6 +84,16 @@ ws_use() {
 		return 1
 	fi
 	ln -snf $TT_HOME/workspaces/$alias $TT_HOME/current
+}
+
+
+ws_edit() {
+	if [ ! -z $1 ]; then
+		echo "unknown parameter: $1"
+		ws_usage
+		return 1
+	fi
+	"${EDITOR:-vi}" $(dc_file)
 }
 
 ws_current() {
