@@ -11,7 +11,7 @@ services:
   ####### services
 
   jackie:
-    image: mhart/alpine-node
+    image: node:alpine
     command: node .
     environment:
       jackie_mongo__url: mongodb://mongo/jackie
@@ -24,7 +24,7 @@ services:
       com.tarantino.source: git@github.com:meet-tarantino/jackie.git
 
   jules:
-    image: mhart/alpine-node
+    image: node:alpine
     command: node .
     environment:
       jules_jackie: http://jackie:8080
