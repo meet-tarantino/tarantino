@@ -8,8 +8,12 @@ dc_file() {
 	echo $(get_workspace_dir)/docker-compose.yml
 }
 
+get_tt_env() {
+	(set -o posix; set) | grep -E 'TT_' | paste -sd " " -
+}
+
 dc() {
-	TT_PROJECTS=$TT_PROJECTS docker-compose -f $(dc_file) $*
+	env $(get_tt_env) docker-compose -f $(dc_file) $*
 }
 
 dc_get_links() {
