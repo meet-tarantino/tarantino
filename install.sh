@@ -61,7 +61,18 @@ install_docker() {
 }
 
 install_docker_compose() {
-	curl -L https://github.com/docker/compose/releases/download/1.9.1/docker-compose-`uname -s`-`uname -m` > /tmp/docker-compose
+	bullet "installing docker-compose"
+	local release=$(curl -fL https://api.github.com/repos/docker/compose/releases/latest -H 'accept: application/json' 2> /dev/null)
+	if [ $? -ne 0 ]; then
+		bullet "docker-compose install failed: unable to query for latest available version"
+		return 1
+	fi
+	local latest=$(echo "$release" | grep tag_name | sed -e 's/.*"tag_name":[^"]*"\([^"]*\)".*/\1/')
+	if [ "$latest" == "" ]; then
+		bullet "docker-compose install failed: unable to determine latest available version"
+		return 1
+	fi
+	curl -L https://github.com/docker/compose/releases/download/$latest/docker-compose-`uname -s`-`uname -m` > /tmp/docker-compose 2> /dev/null
 	sudo mv /tmp/docker-compose /usr/local/bin/
 	sudo chmod +x /usr/local/bin/docker-compose
 }
