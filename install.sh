@@ -85,6 +85,7 @@ install_docker_group() {
 tt_install() {
 	local user=${SUDO_USER:-$USER}
 	local queue=""
+	local install_confirm=""
 
 	info "checking dependencies:"
 
@@ -93,14 +94,17 @@ tt_install() {
 	else
 		bullet "curl (missing)"
 		queue="curl"
+		install_confirm="curl"
 	fi
 
 	if ! has_docker; then
 		queue="$queue docker"
+		install_confirm="${install_confirm} docker"
 	fi
 
 	if ! has_docker_compose; then
 		queue="$queue docker_compose"
+		install_confirm="${install_confirm} docker-compose"
 	fi
 
 	if has_docker_group; then
@@ -112,6 +116,7 @@ tt_install() {
 
 	if [ ! -z "$queue" ]; then
 		echo
+		echo "The following will be installed: ${install_confirm}"
 		read -n 1 -p "Install missing dependencies? (Y/n)" CONFIRM
 		if [ "$CONFIRM" == "n" -o "$CONFIRM" == "N" ]; then
 			echo
