@@ -98,21 +98,38 @@ tt_usage() {
 	tt_header
 	echo "usage: tt <command> [args]"
 	echo
-	echo commands:
+	echo "Tarantino commands:"
 	echo
-	echo '  browse <container[:port][path]> - launch a page of a named container in your browser'
-	echo '  check [service] - check all [or named] source directories'
-	echo '  clone [service] - clone all [or named] source directories'
-	echo '  create [container...] - create all [or named] containers'
-	echo '  dc - run docker-compose commands in the context of your workspace'
-	echo '  destroy [container...] - destroy all [or named] containers'
-	echo '  install - prepare environment for tarantino'
-	echo '  ip <container> - retrieve ip address of a specific container'
-	echo '  pull [service] - pull sources for all [or named] projects without changes'
-	echo '  recreate [container...] - recreate all [or named] containers'
-	echo '  restart - restart all containers'
-	echo '  upgrade - upgrade to latest tarantino version'
-	echo '  workspace [command] - create, remove and switch workspaces'
+	echo "  browse <container[:port][path]> - launch a page of a named container in your browser"
+	echo "  check [service] - check all [or named] source directories"
+	echo "  clone [service] - clone all [or named] source directories"
+	echo "  create [container...] - create all [or named] containers"
+	echo "  dc - run docker-compose commands in the context of your workspace"
+	echo "  destroy [container...] - destroy all [or named] containers"
+	echo "  install - prepare environment for tarantino"
+	echo "  ip <container> - retrieve ip address of a specific container"
+	echo "  pull [service] - pull sources for all [or named] projects without changes"
+	echo "  recreate [container...] - recreate all [or named] containers"
+	echo "  restart - restart all containers"
+	echo "  upgrade - upgrade to latest tarantino version"
+	echo "  workspace [command] - create, remove and switch workspaces"
+	workspace_plugin_usage_
+}
+
+workspace_plugin_usage_() {
+	plugin_usage_functions=$(declare -F | grep 'plugin_usage$' | awk '{print $3}')
+
+	if [ "$plugin_usage_functions" != "" ]; then
+
+		echo
+		echo 'Workspace plugin commands:'
+		echo
+
+		for usage_function in $plugin_usage_functions; do
+			$usage_function
+		done
+	fi
+
 }
 
 tt_browse() {
