@@ -68,15 +68,25 @@ run_sub_command() {
 	local prefix=$1
 	shift
 
+	local show_usage="${prefix}_usage"
+
 	if [ $# -eq 0 ]; then
-		$prefix\_usage
+		$show_usage
 		return 1
 	fi
 
 	local cmd=$1
 	shift
 
-	$prefix\_$cmd $*
+	local command="${prefix}_${cmd}"
+	local command_type=$(type -t $command)
+
+	if [ "$command_type" != "function" ]; then
+		$show_usage
+		return 1
+	fi
+
+	$command $*
 }
 
 tt_header() {
