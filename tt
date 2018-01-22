@@ -189,6 +189,16 @@ tt_check() {
 	fi
 }
 
+get_repo_url() {
+	local src=$1
+	## org/repo shorthand format
+	if [[ $src =~ ^[-A-Za-z0-9_]*\/[-A-Za-z0-9_.]*$ ]]; then
+		echo "git@github.com:${src}.git"
+	else
+		echo ${src}
+	fi
+}
+
 tt_clone() {
 	local projects=$TT_PROJECTS
 	local services=$(dc_get_service_and_dependencies $@)
@@ -197,7 +207,7 @@ tt_clone() {
 	pushd . &> /dev/null
 
 	for service in $services; do
-		local src=${TT_SOURCES[$service]}
+		local src=$(get_repo_url ${TT_SOURCES[$service]})
 
 		# if source is defined but directory doesn't exist
 		if [ ! -z "$src" -a ! -d "$projects/$service" ]; then
