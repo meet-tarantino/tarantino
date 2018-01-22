@@ -165,7 +165,7 @@ tt_check() {
 get_repo_url() {
 	local src=$1
 	## org/repo shorthand format
-	if [[ $src =~ ^[A-Za-z0-9][-_A-Za-z0-9]*[A-Za-z0-9]\/[A-Za-z0-9][-_A-Za-z0-9]*[A-Za-z0-9]$ ]]; then
+	if [[ $src =~ ^[-A-Za-z0-9_]*\/[-A-Za-z0-9_.]*$ ]]; then
 		echo "git@github.com:${src}.git"
 	else
 		echo ${src}
