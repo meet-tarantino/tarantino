@@ -1,0 +1,16 @@
+version: 2
+
+jobs:
+  install:
+    docker:
+      - image: darrenmce/tt-test
+    steps:
+      - checkout
+      - run: sudo -E make install
+
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - install
