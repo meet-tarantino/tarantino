@@ -52,7 +52,7 @@ jobs:
           name: Assert Mongo is up
           command: |
             DOCKER_PS=$(docker ps --format "{{.Image}} {{.Names}}")
-            if [ "$DOCKER_PS" != "mongo test_workspace_mongo_1" ]; then
+            if [ "$DOCKER_PS" != "mongo testworkspace_mongo_1" ]; then
               exit 1
             fi
       - *cleanup_containers
