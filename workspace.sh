@@ -157,5 +157,5 @@ get_workspace_dir() {
 }
 
 get_workspace() {
-	basename "$(get_workspace_dir)"
+	basename "$(get_workspace_dir)" | tr -cd '[:alnum:]' | tr '[:upper:]' '[:lower:]'
 }
