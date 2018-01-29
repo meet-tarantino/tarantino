@@ -1,5 +1,7 @@
 # tarantino - cross-service development environment generation
 
+[![CircleCI](https://circleci.com/gh/meet-tarantino/tarantino.svg?style=svg)](https://circleci.com/gh/meet-tarantino/tarantino)
+
 You've got a shiny new machine and you're fired up to start hacking on your product. Let Tarantino give birth to all of the services comprising your platform.
 
 ## Overview

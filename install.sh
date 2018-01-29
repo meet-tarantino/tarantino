@@ -112,7 +112,11 @@ tt_install() {
 
 	if [ ! -z "$queue" ]; then
 		echo
-		read -n 1 -p "Install missing dependencies? (Y/n)" CONFIRM
+		# skip the read (effectively saying "yes") if in a CI environment
+		if [ "$CI" != "true" ]; then
+			read -n 1 -p "Install missing dependencies? (Y/n)" CONFIRM
+		fi
+
 		if [ "$CONFIRM" == "n" -o "$CONFIRM" == "N" ]; then
 			echo
 			info "You chose not to install required dependencies, there be dragons."
