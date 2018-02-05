@@ -25,7 +25,8 @@ aliases:
   - &cleanup_containers
     run:
       name: clean up all containers
-      command: docker rm -fv $(docker ps -qa)
+      command: "docker ps -qa | xargs -r docker rm -fv"
+
 jobs:
   install:
     docker:
@@ -33,6 +34,13 @@ jobs:
     steps:
       - checkout
       - *install_tt
+      - run:
+          name: Assert binaries
+          command: |
+            test/assert hash curl
+            test/assert hash docker
+            test/assert hash docker-compose
+            test/assert in_docker_group
 
   basic:
     docker:
@@ -50,12 +58,21 @@ jobs:
           command: tt create mongo
       - run:
           name: Assert Mongo is up
-          command: |
-            DOCKER_PS=$(docker ps --format "{{.Image}} {{.Names}}")
-            if [ "$DOCKER_PS" != "mongo testworkspace_mongo_1" ]; then
-              exit 1
-            fi
+          command: test/assert is_running "mongo" "testworkspace_mongo_1"
+      - run:
+          name: Recreate Mongo
+          command: tt recreate mongo
+      - run:
+          name: Assert Mongo is back up
+          command: test/assert is_running "mongo" "testworkspace_mongo_1"
+      - run:
+          name: Destroy Mongo
+          command: tt destroy mongo
+      - run:
+          name: Assert Mongo is destroyed
+          command: test/assert container_destroyed "mongo" "testworkspace_mongo_1"
       - *cleanup_containers
+
 
 workflows:
   version: 2
