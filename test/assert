@@ -1,18 +1,56 @@
 #!/usr/bin/env bash
 
-function is_running() {
+function _is_running() {
 	local IMAGE=$1
 	local CONTAINER_NAME=$2
 	local DOCKER_PS=$(docker ps --format "{{.Image}} {{.Names}}")
 	if [ "$DOCKER_PS" != "${IMAGE} ${CONTAINER_NAME}" ]; then
-	  exit 1
+	  echo "Container not found in:"
+	  docker ps
+	  return 1
+	fi
+}
+
+function _hash() {
+	local BINARY=$1
+
+	if [ -z $BINARY ]; then
+		echo "Cannot assert hash without an argument"
+		return 1
+	fi
+
+	if ! hash $BINARY 2>/dev/null; then
+		echo "${BINARY} not found"
+		return 1
+	fi
+}
+
+function _in_group() {
+	local GROUP=$1
+
+	if [ -z $GROUP ]; then
+		echo "Cannot assert group without an argument"
+		return 1
+	fi
+
+	if ! groups | grep -w "${GROUP}" >/dev/null; then
+		echo "${GROUP} not found in:"
+		groups
+		return 1
 	fi
 }
 
 function assert() {
 	local command=$1
 	shift;
-	$command $@
+	echo "Asserting [ ${command} ] >>> ${@}"
+	\_$command $@
+	if [ $? = 0 ]; then
+		echo "Success!"
+	else
+		echo "Failed."
+		return 1
+	fi
 }
 
 assert $@

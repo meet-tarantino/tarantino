@@ -33,6 +33,13 @@ jobs:
     steps:
       - checkout
       - *install_tt
+      - run:
+          name: Assert binaries
+          command: |
+            test/assert hash curl
+            test/assert hash docker
+            test/assert hash docker-compose
+            test/assert in_group docker
 
   basic:
     docker:
