@@ -25,7 +25,8 @@ aliases:
   - &cleanup_containers
     run:
       name: clean up all containers
-      command: docker ps -qa | xargs -r docker rm -fv
+      command: "docker ps -qa | xargs -r docker rm -fv"
+
 jobs:
   install:
     docker:
@@ -58,7 +59,20 @@ jobs:
       - run:
           name: Assert Mongo is up
           command: test/assert is_running "mongo" "testworkspace_mongo_1"
+      - run:
+          name: Recreate Mongo
+          command: tt recreate mongo
+      - run:
+          name: Assert Mongo is back up
+          command: test/assert is_running "mongo" "testworkspace_mongo_1"
+      - run:
+          name: Destroy Mongo
+          command: tt destroy mongo
+      - run:
+          name: Assert Mongo is destroyed
+          command: test/assert container_destroyed "mongo" "testworkspace_mongo_1"
       - *cleanup_containers
+
 
 workflows:
   version: 2

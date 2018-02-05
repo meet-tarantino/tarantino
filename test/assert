@@ -1,15 +1,30 @@
 #!/usr/bin/env bash
 
+## Container Assertions
+
 function _is_running() {
 	local IMAGE=$1
 	local CONTAINER_NAME=$2
 	local DOCKER_PS=$(docker ps --format "{{.Image}} {{.Names}}")
-	if [ "$DOCKER_PS" != "${IMAGE} ${CONTAINER_NAME}" ]; then
+	if ! grep -qx "${IMAGE} ${CONTAINER_NAME}" <<< $DOCKER_PS; then
 	  echo "Container not found in:"
 	  docker ps
 	  return 1
 	fi
 }
+
+function _container_destroyed() {
+	local IMAGE=$1
+	local CONTAINER_NAME=$2
+	local DOCKER_PS_ALL=$(docker ps -a --format "{{.Image}} {{.Names}}")
+	if grep -qa "${IMAGE} ${CONTAINER_NAME}" <<< $DOCKER_PS_ALL; then
+		echo "Container still found in:"
+		docker ps -a
+		return 1
+	fi
+}
+
+## Installation Assertions
 
 function _hash() {
 	local BINARY=$1
