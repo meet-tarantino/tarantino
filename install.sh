@@ -52,6 +52,7 @@ has_docker_group() {
 
 install_curl() {
 	info Installing curl...
+	sudo apt-get update
 	sudo apt-get install -y curl
 }
 
