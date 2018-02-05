@@ -50,11 +50,7 @@ jobs:
           command: tt create mongo
       - run:
           name: Assert Mongo is up
-          command: |
-            DOCKER_PS=$(docker ps --format "{{.Image}} {{.Names}}")
-            if [ "$DOCKER_PS" != "mongo testworkspace_mongo_1" ]; then
-              exit 1
-            fi
+          command: test/assert is_running "mongo" "testworkspace_mongo_1"
       - *cleanup_containers
 
 workflows:

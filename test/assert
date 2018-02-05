@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+function is_running() {
+	local IMAGE=$1
+	local CONTAINER_NAME=$2
+	local DOCKER_PS=$(docker ps --format "{{.Image}} {{.Names}}")
+	if [ "$DOCKER_PS" != "${IMAGE} ${CONTAINER_NAME}" ]; then
+	  exit 1
+	fi
+}
+
+function assert() {
+	local command=$1
+	shift;
+	$command $@
+}
+
+assert $@
