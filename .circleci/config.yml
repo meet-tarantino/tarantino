@@ -25,7 +25,7 @@ aliases:
   - &cleanup_containers
     run:
       name: clean up all containers
-      command: docker rm -fv $(docker ps -qa)
+      command: docker ps -qa | xargs -r docker rm -fv
 jobs:
   install:
     docker:
