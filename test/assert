@@ -25,17 +25,12 @@ function _hash() {
 	fi
 }
 
-function _in_group() {
-	local GROUP=$1
-
-	if [ -z $GROUP ]; then
-		echo "Cannot assert group without an argument"
-		return 1
-	fi
-
-	if ! groups | grep -w "${GROUP}" >/dev/null; then
-		echo "${GROUP} not found in:"
-		groups
+function _in_docker_group() {
+	local USER=$(whoami)
+	local GROUP_MEMBERS=$(cat /etc/group | awk -F':' '/docker/{print $4}')
+	if ! grep -qw "${USER}" <<< $GROUP_MEMBERS; then
+		echo "${USER} not found in:"
+		echo "${GROUP_MEMBERS}"
 		return 1
 	fi
 }
