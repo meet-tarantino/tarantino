@@ -17,7 +17,7 @@ function _container_destroyed() {
 	local IMAGE=$1
 	local CONTAINER_NAME=$2
 	local DOCKER_PS_ALL=$(docker ps -a --format "{{.Image}} {{.Names}}")
-	if grep -qa "${IMAGE} ${CONTAINER_NAME}" <<< $DOCKER_PS_ALL; then
+	if grep -qx "${IMAGE} ${CONTAINER_NAME}" <<< $DOCKER_PS_ALL; then
 		echo "Container still found in:"
 		docker ps -a
 		return 1
