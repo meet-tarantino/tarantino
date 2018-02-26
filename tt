@@ -52,13 +52,7 @@ main() {
 			;;
 		esac
 	else
-		## load workspace plugins
-		if [ -d "$workspace_dir/plugins" ]; then
-			for plugin in $(find "$workspace_dir/plugins" -name '*.sh')
-			do
-				source $plugin
-			done
-		fi
+		. load_workspace_plugins
 	fi
 
 	run_sub_command tt $@
