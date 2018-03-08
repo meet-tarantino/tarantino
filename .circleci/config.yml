@@ -57,26 +57,8 @@ jobs:
       - *install_tt
       - *create_test_workspace
       - run:
-          name: Usage
-          command: tt usage
-      - run:
-          name: Create Mongo
-          command: tt create mongo
-      - run:
-          name: Assert Mongo is up
-          command: test/assert is_running "mongo" "testworkspace_mongo_1"
-      - run:
-          name: Recreate Mongo
-          command: tt recreate mongo
-      - run:
-          name: Assert Mongo is back up
-          command: test/assert is_running "mongo" "testworkspace_mongo_1"
-      - run:
-          name: Destroy Mongo
-          command: tt destroy mongo
-      - run:
-          name: Assert Mongo is destroyed
-          command: test/assert container_destroyed "mongo" "testworkspace_mongo_1"
+          name: Basic Mongo Tests
+          command: test/basic_mongo.bats
       - *cleanup_containers
 
 
