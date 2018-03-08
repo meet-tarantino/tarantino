@@ -35,12 +35,8 @@ jobs:
       - checkout
       - *install_tt
       - run:
-          name: Assert binaries
-          command: |
-            test/assert hash curl
-            test/assert hash docker
-            test/assert hash docker-compose
-            test/assert in_docker_group
+          name: Validate Install
+          command: test/valid_install.bats
 
   basic:
     docker:
