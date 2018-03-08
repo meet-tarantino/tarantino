@@ -26,6 +26,7 @@ aliases:
     run:
       name: clean up all containers
       command: "docker ps -qa | xargs -r docker rm -fv"
+      when: always
 
   - &sync-submodules
     run:
