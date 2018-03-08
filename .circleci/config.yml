@@ -27,12 +27,21 @@ aliases:
       name: clean up all containers
       command: "docker ps -qa | xargs -r docker rm -fv"
 
+  - &sync-submodules
+    run:
+      name: Sync up submodules
+      command: |
+        git submodule sync
+        git submodule update --init
+
+
 jobs:
   install:
     docker:
       - image: darrenmce/tt-test-install
     steps:
       - checkout
+      - *sync-submodules
       - *install_tt
       - run:
           name: Validate Install
@@ -43,6 +52,7 @@ jobs:
       - image: darrenmce/tt-test-base
     steps:
       - checkout
+      - *sync-submodules
       - *remote_docker
       - *install_tt
       - *create_test_workspace
