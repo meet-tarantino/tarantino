@@ -48,7 +48,7 @@ jobs:
           name: Validate Install
           command: test/valid_install.bats
 
-  basic:
+  dockerTests:
     docker:
       - image: darrenmce/tt-test-base
     steps:
@@ -62,10 +62,21 @@ jobs:
           command: test/basic_mongo.bats
       - *cleanup_containers
 
+  noDockerTests:
+    docker:
+      - image: darrenmce/tt-test-base
+    steps:
+      - checkout
+      - *sync-submodules
+      - *install_tt
+      - run:
+          name: Workspace tests
+          command: test/workspace.bats
 
 workflows:
   version: 2
   test:
     jobs:
       - install
-      - basic
+      - dockerTests
+      - noDockerTests

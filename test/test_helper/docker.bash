@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 function d_is_running() {
 	local IMAGE=$1
 	local CONTAINER_NAME=$2
