@@ -37,7 +37,7 @@ aliases:
 
 
 jobs:
-  install:
+  installTests:
     docker:
       - image: darrenmce/tt-test-install
     steps:
@@ -77,6 +77,6 @@ workflows:
   version: 2
   test:
     jobs:
-      - install
+      - installTests
       - dockerTests
       - noDockerTests
