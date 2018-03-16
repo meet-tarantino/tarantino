@@ -140,6 +140,8 @@ init() {
 
 	ws_add $alias `pwd`
 	ws_use $alias
+	echo "Setting current workspace to: ${alias}"
+	ws_current
 }
 
 is_workspace() {
