@@ -26,57 +26,57 @@ aliases:
     run:
       name: clean up all containers
       command: "docker ps -qa | xargs -r docker rm -fv"
+      when: always
+
+  - &sync-submodules
+    run:
+      name: Sync up submodules
+      command: |
+        git submodule sync
+        git submodule update --init
+
 
 jobs:
-  install:
+  installTests:
     docker:
       - image: darrenmce/tt-test-install
     steps:
       - checkout
+      - *sync-submodules
       - *install_tt
       - run:
-          name: Assert binaries
-          command: |
-            test/assert hash curl
-            test/assert hash docker
-            test/assert hash docker-compose
-            test/assert in_docker_group
+          name: Validate Install
+          command: test/valid_install.bats
 
-  basic:
+  dockerTests:
     docker:
       - image: darrenmce/tt-test-base
     steps:
       - checkout
+      - *sync-submodules
       - *remote_docker
       - *install_tt
       - *create_test_workspace
       - run:
-          name: Usage
-          command: tt usage
-      - run:
-          name: Create Mongo
-          command: tt create mongo
-      - run:
-          name: Assert Mongo is up
-          command: test/assert is_running "mongo" "testworkspace_mongo_1"
-      - run:
-          name: Recreate Mongo
-          command: tt recreate mongo
-      - run:
-          name: Assert Mongo is back up
-          command: test/assert is_running "mongo" "testworkspace_mongo_1"
-      - run:
-          name: Destroy Mongo
-          command: tt destroy mongo
-      - run:
-          name: Assert Mongo is destroyed
-          command: test/assert container_destroyed "mongo" "testworkspace_mongo_1"
+          name: Basic Mongo Tests
+          command: test/basic_mongo.bats
       - *cleanup_containers
 
+  noDockerTests:
+    docker:
+      - image: darrenmce/tt-test-base
+    steps:
+      - checkout
+      - *sync-submodules
+      - *install_tt
+      - run:
+          name: Workspace tests
+          command: test/workspace.bats
 
 workflows:
   version: 2
   test:
     jobs:
-      - install
-      - basic
+      - installTests
+      - dockerTests
+      - noDockerTests

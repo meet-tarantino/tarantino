@@ -17,6 +17,9 @@ RUN apt-get install -y apt-transport-https curl ca-certificates software-propert
 
 RUN chmod +x /usr/local/bin/docker-compose
 
+RUN git clone https://github.com/sstephenson/bats.git /tmp/bats \
+  && cd /tmp/bats \
+  && ./install.sh /usr/local
+
 USER testuser
 WORKDIR /home/testuser
-
