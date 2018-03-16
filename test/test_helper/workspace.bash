@@ -15,3 +15,9 @@ function rm_workspace() {
 	rm ~/.tt/workspaces/${WS}
 	rm -rf ${WS_DIR}
 }
+
+function rm_all_workspaces() {
+	rm -f ~/.tt/workspaces/*
+	rm -f ~/.tt/current
+	return 0
+}
