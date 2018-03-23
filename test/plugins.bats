@@ -29,6 +29,8 @@ function teardown() {
 }
 
 @test "plugin variables that start with TT_ will be slurped in" {
+	debug_header
+
 	echo 'TT_TEST_VAR=foo' > "${TEST_WORKSPACE_DIR}/plugins/vars.sh"
 	echo 'tt_testplugin() { echo "test: ${TT_TEST_VAR}"; }' > "${TEST_WORKSPACE_DIR}/plugins/test.sh"
 
@@ -37,6 +39,8 @@ function teardown() {
 }
 
 @test "plugin variables _exported_ should be available to tt commands (without TT_ prefix)" {
+	debug_header
+
 	echo 'export TEST_VAR=foo' > "${TEST_WORKSPACE_DIR}/plugins/vars.sh"
 	echo 'tt_testplugin() { echo "test: ${TEST_VAR}"; }' > "${TEST_WORKSPACE_DIR}/plugins/test.sh"
 
@@ -46,6 +50,8 @@ function teardown() {
 
 
 @test "plugin variables should work with docker-compose" {
+	debug_header
+
 	echo 'TT_TEST_VAR=foo' > "${TEST_WORKSPACE_DIR}/plugins/vars.sh"
 	(cat << EOF
 version: '2'
@@ -62,6 +68,8 @@ EOF
 }
 
 @test "plugin usage functions should append to the usage instructions" {
+	debug_header
+
 	echo 'test_plugin_usage() { echo "this is how you use the command"; }' > "${TEST_WORKSPACE_DIR}/plugins/usage.sh"
 	run tt usage
 	assert_line --partial "Workspace plugin commands:"
@@ -69,11 +77,15 @@ EOF
 }
 
 @test "plugin usage should not exist if there is no usage commands" {
+	debug_header
+
 	run tt usage
 	refute_line --partial "Workspace plugin commands:"
 }
 
 @test "plugin usage functions should append to the usage instructions (multiple)" {
+	debug_header
+
 	echo 'test_plugin_usage() { echo "this is how you use the command"; }' > "${TEST_WORKSPACE_DIR}/plugins/usage.sh"
 	echo 'test2_plugin_usage() { echo "this command is cool"; }' > "${TEST_WORKSPACE_DIR}/plugins/usage2.sh"
 	echo 'not_valid_usage() { echo "this should not show up"; }' > "${TEST_WORKSPACE_DIR}/plugins/usage3.sh"
