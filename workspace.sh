@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+echoerr() {
+	(>&2 echo "Error: $@")
+}
+
 tt_workspace() {
 	run_sub_command ws $@
 }
@@ -50,25 +54,40 @@ ws_add() {
 
 ws_rm() {
 	local alias=$1
-	if ! is_workspace $alias; then
-		echo "$alias is not a registered workspace"
+
+	local ws_link=$TT_HOME/workspaces/$alias
+
+	if [ ! -L "$ws_link" ]; then
+		echoerr "$alias is not a registered workspace"
 		return 1
 	fi
 
-	# destroy containers in the workspace to be removed and remove workspace
-	local previous=$(get_workspace)
-	ws_use $alias
-	tt_destroy
-	rm $TT_HOME/workspaces/$alias
-
-	# if the workspace was previously in context
-	if [ "$previous" == "$alias" ]; then
-		# clear current
-		rm $TT_HOME/current
-	else
-		# otherwise, revert to whatever our previous workspace was
-		ws_use "$previous"
+	if ! [[ -L "$ws_link" && -d  "$ws_link" ]]; then
+		echo "Detected '$alias' as a broken workspace link"
+		echo " You may have deleted or moved the workspace contents before running 'tt workspace rm $alias'"
+		echo " Cleaning up the workspace link..."
+		echo " NOTE: you may have orphan containers still running"
+		rm $TT_HOME/workspaces/$alias
+		return 0
 	fi
+
+	local current_ws=$(get_workspace)
+
+	## Destroy running containers
+	if [ "$current_ws" != "$alias" ]; then
+		ws_use $alias
+		echo "Running 'tt destroy' for the '${alias}' workspace"
+		tt_destroy
+		ws_use $current_ws
+	else
+		# if the workspace was previously in context
+		echo "Running 'tt destroy' for the '${alias}' workspace"
+		tt_destroy
+		echo "Current workspace has been removed, you will have to select a new one"
+		rm $TT_HOME/current
+	fi
+
+	rm $TT_HOME/workspaces/$alias
 }
 
 ws_ls() {
@@ -89,7 +108,7 @@ ws_use() {
 
 ws_edit() {
 	if [ ! -z $1 ]; then
-		echo "unknown parameter: $1"
+		echoerr "unknown parameter: $1"
 		ws_usage
 		return 1
 	fi
@@ -97,6 +116,10 @@ ws_edit() {
 }
 
 ws_current() {
+	if ! (get_workspace_dir >/dev/null); then
+		echoerr "No workspace selected"
+		return 1
+	fi
 	echo $(get_workspace) '->' $(readlink -f "$(get_workspace_dir)")
 }
 
@@ -114,7 +137,7 @@ ws_init() {
 }
 
 ws_upgrade() {
-	echo "'upgrade' command not yet implemented :("
+	echoerr "'upgrade' command not yet implemented :("
 	return 1;
 }
 
@@ -125,7 +148,7 @@ init() {
 	fi
 
 	if $(is_workspace $alias); then
-		echo "Error: a workspace with the name '$alias' already exists"
+		echoerr "a workspace with the name '$alias' already exists"
 		return 1
 	fi
 
@@ -140,6 +163,8 @@ init() {
 
 	ws_add $alias `pwd`
 	ws_use $alias
+	echo "Setting current workspace to: ${alias}"
+	ws_current
 }
 
 is_workspace() {
