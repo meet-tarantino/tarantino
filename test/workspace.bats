@@ -5,8 +5,8 @@ load 'test_helper/bats-support/load'
 load 'test_helper/bats-assert/load'
 load 'test_helper/workspace'
 
-TEST_WORKSPACE_DIR="/tmp/tttestws"
-TEST_WORKSPACE="tttestws"
+TEST_WORKSPACE_DIR="/tmp/testws"
+TEST_WORKSPACE="testws"
 
 
 function setup() {
@@ -36,7 +36,7 @@ function teardown() {
 @test "current: should error if no current workspace" {
 	debug_header
 
-	tt workspace rm tttestws
+	tt workspace rm testws
 
 	run tt workspace current
 	assert_failure
@@ -81,13 +81,13 @@ function teardown() {
 
 	run tt workspace ls
 	assert_line "mytestworkspace"
-	assert_line "tttestws"
+	assert_line "testws"
 
 	run tt workspace rm mytestworkspace
 	assert_success
 
 	run tt workspace ls
-	assert_line "tttestws"
+	assert_line "testws"
 	refute_line "mytestworkspace"
 }
 
@@ -95,13 +95,13 @@ function teardown() {
 	debug_header
 
 	run tt workspace ls
-	assert_line "tttestws"
+	assert_line "testws"
 
-	run tt workspace rm tttestws
+	run tt workspace rm testws
 	assert_success
 
 	run tt workspace ls
-	refute_line "tttestws"
+	refute_line "testws"
 }
 
 @test "rm: should clean up a broken link (manual delete of ws)" {
