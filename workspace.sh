@@ -19,7 +19,7 @@ ws_usage() {
 	echo '  edit - opens the current workspace docker-compose.yml for editing'
 	echo '  rm <workspace> - unregister a workspace from your user account'
 	echo '  ls - list registered workspaces '
-	echo '  use <workspace> - switch to a different workspace'
+	echo '  use <workspace> - switch to a different workspace (use - to switch back to previous)'
 	echo '  current - display the current workspace and directory'
 	echo '  upgrade [workspace] - NOT YET IMPLEMENTED: fetch latest workspace definition, update docker images'
 }
