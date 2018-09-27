@@ -74,6 +74,31 @@ function teardown() {
 	assert_output --partial "mytestworkspace"
 }
 
+@test "use: should be able to switch back to previous workspace" {
+	debug_header
+
+	WS_DIR=$(add_new_workspace mytestworkspace)
+	add_new_workspace otherworkspace
+
+	run tt workspace use mytestworkspace
+	assert_success
+	run tt workspace use otherworkspace
+	assert_success
+	run tt workspace use -
+	assert_success
+
+	run tt workspace current
+	assert_output --partial "mytestworkspace"
+}
+
+@test "use: should error when no workspace to switch back to" {
+	debug_header
+
+	run tt workspace use -
+	assert_failure
+	assert_output "no previous workspace to switch back to"
+}
+
 @test "rm: should remove another workspace" {
 	debug_header
 

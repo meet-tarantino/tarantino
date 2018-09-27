@@ -98,10 +98,25 @@ ws_ls() {
 
 ws_use() {
 	local alias=$1
+
+	if [ "$alias" == "-" ]; then
+		alias=$(get_workspace "$(readlink "$TT_HOME/previous")")
+		if [ ! -d "$TT_HOME/previous" ]; then
+			echo "no previous workspace to switch back to"
+			return 1
+		fi
+	fi
+
 	if ! is_workspace $alias; then
 		echo "$alias is not a registered workspace"
 		return 1
 	fi
+
+	# track previous workspace for quick switching
+	if is_workspace_selected; then
+		ln -snf "$(get_workspace_dir)" "$TT_HOME/previous"
+	fi
+
 	ln -snf $TT_HOME/workspaces/$alias $TT_HOME/current
 }
 
@@ -116,7 +131,7 @@ ws_edit() {
 }
 
 ws_current() {
-	if ! (get_workspace_dir >/dev/null); then
+	if ! is_workspace_selected; then
 		echoerr "No workspace selected"
 		return 1
 	fi
@@ -177,10 +192,19 @@ is_workspace_dir() {
 	fi
 }
 
+is_workspace_selected() {
+	get_workspace_dir >/dev/null
+}
+
 get_workspace_dir() {
 	readlink "$TT_HOME/current"
 }
 
 get_workspace() {
-	basename "$(get_workspace_dir)" | tr -cd '[:alnum:]' | tr '[:upper:]' '[:lower:]'
+	dir="$(get_workspace_dir)"
+	if [ $# -eq 1 ]; then
+		dir=$1
+	fi
+
+	basename "$dir" | tr -cd '[:alnum:]' | tr '[:upper:]' '[:lower:]'
 }
