@@ -1,0 +1,6 @@
+version: '2'
+
+services:
+  hello:
+    image: darrenmce/hello-node
+    network_mode: host

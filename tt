@@ -111,7 +111,7 @@ tt_usage() {
 	echo "  dc - run docker-compose commands in the context of your workspace"
 	echo "  destroy [container...] - destroy all [or named] containers"
 	echo "  install - prepare environment for tarantino"
-	echo "  ip <container> [-q] - retrieve ip addresses for a specific container [-q quiet: for only 1 unlabelled ip]"
+	echo "  ip <container> [-q | network_name] - retrieve ip addresses for a specific container [-q quiet or <network name>]: for only 1 unlabelled ip]"
 	echo "  pull [service] - pull sources for all [or named] projects without changes"
 	echo "  recreate [container...] - recreate all [or named] containers"
 	echo "  restart - restart all containers"
@@ -301,6 +301,18 @@ tt_ip() {
 		fi
 		echo ${tokens[0]} | cut -d ":" -f 2
 		return;
+	fi
+
+	# assume -q not provided
+	if [[ ! -z $2 ]]; then
+		NETWORK_NAME=$(get_workspace)_$2
+		for token in $tokens; do
+			if [[ $(echo ${token} | cut -d ":" -f 1) == $NETWORK_NAME ]]; then
+				echo $token | cut -d ":" -f 2
+				return;
+			fi
+		done
+		return 1;
 	fi
 
 	for pair in $ip_pairs; do

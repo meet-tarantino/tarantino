@@ -1,0 +1,10 @@
+version: '2'
+
+services:
+  hello:
+    image: darrenmce/hello-node
+    networks:
+      - testnetwork
+
+networks:
+  testnetwork:
