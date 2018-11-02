@@ -61,6 +61,10 @@ jobs:
           name: Basic Mongo Tests
           command: test/basic_mongo.bats
       - *cleanup_containers
+      - run:
+          name: tt_ip Tests
+          command: test/tt_ip.bats
+      - *cleanup_containers
 
   noDockerTests:
     docker:

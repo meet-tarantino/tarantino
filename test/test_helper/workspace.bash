@@ -5,7 +5,16 @@ function add_new_workspace() {
 	TMP_DIR=$(mktemp -d)
 	cd ${TMP_DIR}
 	touch docker-compose.yml
-	tt workspace add $1 "${TMP_DIR}"
+	tt workspace add "${WS_NAME}" "${TMP_DIR}"
+	echo "${TMP_DIR}"
+}
+
+function add_ws_from_yaml() {
+	YAML=$1
+	WS_NAME=$(basename $YAML .yml)
+	TMP_DIR=$(mktemp -d)
+	ln -s "${YAML}" "${TMP_DIR}/docker-compose.yml"
+	tt workspace add "${WS_NAME}" "${TMP_DIR}"
 	echo "${TMP_DIR}"
 }
 

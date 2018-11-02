@@ -111,7 +111,7 @@ tt_usage() {
 	echo "  dc - run docker-compose commands in the context of your workspace"
 	echo "  destroy [container...] - destroy all [or named] containers"
 	echo "  install - prepare environment for tarantino"
-	echo "  ip <container> - retrieve ip address of a specific container"
+	echo "  ip <container> [-q | network_name] - retrieve ip addresses for a specific container [-q quiet or <network name>]: for only 1 unlabelled ip]"
 	echo "  pull [service] - pull sources for all [or named] projects without changes"
 	echo "  recreate [container...] - recreate all [or named] containers"
 	echo "  restart - restart all containers"
@@ -152,14 +152,14 @@ tt_browse() {
 	  return 1
 	fi
 
-	local ip=$(tt_ip $container)
+	local ip=$(tt_ip $container -q)
 	local url=http://$ip$port$path
 
 	if [ "$ip" = "" ]; then
 		echo $container is not running, starting
 		tt_create $container
 
-		local ip=$(tt_ip $container)
+		local ip=$(tt_ip $container -q)
 		local host=http://$ip$port
 		local url=$host$path
 
@@ -272,7 +272,8 @@ tt_create() {
 	fi
 	dc up -d $@
 	for service in $@; do
-		echo $service: $(tt_ip $service)
+		echo "$service ip(s):"
+		tt_ip $service
 	done
 }
 
@@ -286,8 +287,38 @@ tt_destroy() {
 	fi
 }
 
+
 tt_ip() {
-	docker inspect --format '{{ .NetworkSettings.Networks.'$(get_workspace)'_default.IPAddress }}' $(get_workspace)_$1\_1
+	ip_pairs=$(docker inspect --format '{{range $i, $n := .NetworkSettings.Networks }}{{$i}}:{{$n.IPAddress}} {{end}}' $(get_workspace)_$1\_1)
+	tokens=($(echo $ip_pairs | tr ' ' "\n"))
+
+	# if in quiet mode, or there is only one network, output only the one IP
+	if [[ $2 == "-q" ]] || [[ ${#tokens[@]} -eq 1 ]]; then
+		# if the container is in host mode, output 0.0.0.0
+		if [[ ${tokens[0]} == "host:" ]]; then
+			echo "0.0.0.0"
+			return;
+		fi
+		echo ${tokens[0]} | cut -d ":" -f 2
+		return;
+	fi
+
+	# assume -q not provided
+	if [[ ! -z $2 ]]; then
+		NETWORK_NAME=$(get_workspace)_$2
+		for token in $tokens; do
+			if [[ $(echo ${token} | cut -d ":" -f 1) == $NETWORK_NAME ]]; then
+				echo $token | cut -d ":" -f 2
+				return;
+			fi
+		done
+		return 1;
+	fi
+
+	for pair in $ip_pairs; do
+		echo $pair
+	done
+
 }
 
 tt_recreate() {
