@@ -13,6 +13,7 @@ function add_ws_from_yaml() {
 	YAML=$1
 	WS_NAME=$(basename $YAML .yml)
 	TMP_DIR=$(mktemp -d)
+	cp -r "$(dirname $YAML)"/* "$TMP_DIR"
 	ln -s "${YAML}" "${TMP_DIR}/docker-compose.yml"
 	tt workspace add "${WS_NAME}" "${TMP_DIR}"
 	echo "${TMP_DIR}"

@@ -13,7 +13,7 @@ get_tt_env() {
 }
 
 dc() {
-	env $(get_tt_env) docker-compose -f $(dc_file) $*
+	env $(get_tt_env) docker-compose -p $(get_workspace) -f $(dc_file) $*
 }
 
 dc_get_links() {

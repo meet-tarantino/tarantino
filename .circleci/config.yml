@@ -65,6 +65,10 @@ jobs:
           name: tt_ip Tests
           command: test/tt_ip.bats
       - *cleanup_containers
+      - run:
+          name: Buildable Services Tests
+          command: test/build_service.bats
+      - *cleanup_containers
 
   noDockerTests:
     docker:
