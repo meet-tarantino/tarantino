@@ -114,7 +114,7 @@ ws_use() {
 
 	# track previous workspace for quick switching
 	if is_workspace_selected; then
-		ln -snf "$(get_workspace_alias_dir)" "$TT_HOME/previous"
+		ln -snf "$(get_workspace_dir)" "$TT_HOME/previous"
 	fi
 
 	ln -snf $TT_HOME/workspaces/$alias $TT_HOME/current
@@ -135,7 +135,7 @@ ws_current() {
 		echoerr "No workspace selected"
 		return 1
 	fi
-	echo $(get_workspace) '->' $(get_workspace_dir)
+	echo $(get_workspace) '->' $(readlink -f "$(get_workspace_dir)")
 }
 
 ws_init() {
@@ -193,19 +193,15 @@ is_workspace_dir() {
 }
 
 is_workspace_selected() {
-	get_workspace_alias_dir >/dev/null
+	get_workspace_dir >/dev/null
 }
 
 get_workspace_dir() {
-	readlink -f "$TT_HOME/current"
-}
-
-get_workspace_alias_dir() {
 	readlink "$TT_HOME/current"
 }
 
 get_workspace() {
-	dir="$(get_workspace_alias_dir)"
+	dir="$(get_workspace_dir)"
 	if [ $# -eq 1 ]; then
 		dir=$1
 	fi
