@@ -5,10 +5,10 @@ load 'test_helper/bats-support/load'
 load 'test_helper/bats-assert/load'
 load 'test_helper/workspace'
 
-BUILD_SERVICE_YML="${PWD}/test/test_yamls/build/build_service.yml"
+BUILD_SERVICE_DIR="${PWD}/test/test_yamls/build"
 
 function setup() {
-	add_ws_from_yaml ${BUILD_SERVICE_YML}
+	add_ws_dir ${BUILD_SERVICE_DIR} tarantino/build_service.yml
 }
 
 function teardown() {
