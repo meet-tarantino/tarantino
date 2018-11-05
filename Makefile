@@ -1,18 +1,22 @@
+INSTALL_DIR = /usr/local/share/tarantino
+BIN_DIR = /usr/local/bin
+COMPLETION_DIR = /etc/bash_completion.d
+
 all:
 
 install: uninstall
-	cp tt /usr/local/bin/ && \
-		mkdir -p /usr/local/share/tarantino/templates && \
-		cp *.sh /usr/local/share/tarantino && \
-		cp -R templates /usr/local/share/tarantino && \
-		cp -f tt_completion /usr/local/share/tarantino && \
-		cp -f tt_completion_hook.bash /etc/bash_completion.d/ && \
+	mkdir -p ${INSTALL_DIR}/templates && \
+		cp *.sh ${INSTALL_DIR} && \
+		cp -f tt ${INSTALL_DIR} && \
+		ln -sf ${INSTALL_DIR}/tt ${BIN_DIR}/tt &&\
+		cp -f tt_completion ${INSTALL_DIR} && \
+		cp -R templates ${INSTALL_DIR} && \
+		cp -f tt_completion_hook.bash ${COMPLETION_DIR}/ && \
+		git describe --always --tags > ${INSTALL_DIR}/version.txt &&\
 		./tt install && \
-		echo Installation complete. && \
-		echo Press enter to continue.
+		echo Installation complete.
 
 uninstall:
-		rm -f /usr/local/bin/tt && \
-		rm -rf /usr/local/share/tarantino && \
-		rm -f /etc/bash_completion.d/tt_completion_hook.bash
-
+		rm -f ${BIN_DIR}/tt && \
+		rm -rf ${INSTALL_DIR} && \
+		rm -f ${COMPLETION_DIR}/tt_completion_hook.bash

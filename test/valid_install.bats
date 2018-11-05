@@ -21,3 +21,12 @@ load 'test_helper/bats-assert/load'
 	run grep -w "${USER}" <<< $GROUP_MEMBERS
 	assert_equal "$output" "${USER}"
 }
+
+@test "tt is available" {
+	hash tt
+}
+
+@test "tt version is available" {
+	tt version
+	assert_success
+}
