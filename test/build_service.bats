@@ -8,7 +8,7 @@ load 'test_helper/workspace'
 BUILD_SERVICE_DIR="${PWD}/test/test_yamls/build"
 
 function setup() {
-	add_ws_dir ${BUILD_SERVICE_DIR} tarantino/build_service.yml
+	add_dir_with_ws ${BUILD_SERVICE_DIR} tarantino/build_service.yml
 }
 
 function teardown() {
