@@ -44,6 +44,7 @@ main() {
 		case "$1" in
 		install) ;;
 		upgrade) ;;
+		version) ;;
 		workspace) ;;
 		*)
 			>&2 echo "ERROR: You don't have an active workspace. Run 'tt workspace use <workspace>' to select one."
@@ -116,6 +117,7 @@ tt_usage() {
 	echo "  recreate [container...] - recreate all [or named] containers"
 	echo "  restart - restart all containers"
 	echo "  upgrade - upgrade to latest tarantino version"
+	echo "  version - outputs the tt version"
 	echo "  workspace [command] - create, remove and switch workspaces"
 	workspace_plugin_usage_
 }
@@ -341,6 +343,14 @@ tt_upgrade() {
 
 tt_get_workspace() {
 	get_workspace
+}
+
+tt_version() {
+	if ! $TT_IS_GLOBAL; then
+		echo "local"
+		return 0;
+	fi
+	cat "${TT_SHARE}/version.txt" 2> /dev/null
 }
 
 main $@
