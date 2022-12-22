@@ -212,3 +212,17 @@ get_workspace() {
 
 	basename "$dir" | tr -cd '[:alnum:]' | tr '[:upper:]' '[:lower:]'
 }
+
+get_container_name() {
+	if is_dc_v2; then
+		echo "$(get_workspace)-$1-1"
+	else
+		echo "$(get_workspace)_$1_1"
+	fi
+}
+
+get_network_name() {
+	local network=${1:-default}
+	#docker-compose v2 did not change network naming
+	echo "$(get_workspace)_$network"
+}

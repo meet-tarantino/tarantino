@@ -12,17 +12,17 @@ load 'test_helper/docker'
 @test "It should create mongo" {
 	run tt create mongo
 	assert_success
-	d_is_running mongo testworkspace_mongo_1
+	d_is_running mongo testworkspace mongo
 }
 
 @test "It should recreate mongo" {
 	run tt recreate mongo
 	assert_success
-	d_is_running mongo testworkspace_mongo_1
+	d_is_running mongo testworkspace mongo
 }
 
 @test "It should destroy mongo" {
 	run tt destroy mongo
 	assert_success
-	d_is_destroyed mongo testworkspace_mongo_1
+	d_is_destroyed mongo testworkspace mongo
 }

@@ -8,6 +8,10 @@ dc_file() {
 	echo $(get_workspace_dir)/docker-compose.yml
 }
 
+is_dc_v2() {
+  [[ $(tt_dc -v) == *' v2.'* ]]
+}
+
 get_tt_env() {
 	(set -o posix; set) | grep -E 'TT_' | paste -sd " " -
 }
