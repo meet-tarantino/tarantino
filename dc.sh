@@ -9,7 +9,7 @@ dc_file() {
 }
 
 is_dc_v2() {
-  [[ $(tt_dc -v) == *' v2.'* ]]
+  [[ $(docker-compose -v) == *' v2.'* ]]
 }
 
 get_tt_env() {
