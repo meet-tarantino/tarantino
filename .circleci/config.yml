@@ -4,7 +4,7 @@ aliases:
 
   - &remote_docker
     setup_remote_docker:
-      version: 17.10.0-ce
+      version: 20.10.18
 
   - &install_tt
     run:

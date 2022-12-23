@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM ubuntu:22.04
 
 RUN apt-get update && apt-get install -y git make sudo
 
@@ -12,4 +12,3 @@ RUN git clone https://github.com/sstephenson/bats.git /tmp/bats \
 
 USER testuser
 WORKDIR /home/testuser
-
